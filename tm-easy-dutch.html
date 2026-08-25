@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>TM Easy Dutch</title>
+<style>
+:root{
+  --delft: #1B3A6B;
+  --delft-deep: #12294D;
+  --delft-mid: #3E6FA8;
+  --delft-pale: #CFE0F0;
+  --porcelain: #F6F3EC;
+  --porcelain-2: #EFEAE0;
+  --ochre: #CE9B3F;
+  --ochre-deep: #A97B28;
+  --ink: #1E2430;
+  --ink-soft: #5B6472;
+  --good: #3E7D5B;
+  --bad: #B14A3D;
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(18,41,77,0.12);
+  --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--porcelain);
+  color:var(--ink);
+  font-family:var(--font-body);
+  min-height:100vh;
+  -webkit-tap-highlight-color:transparent;
+}
+.app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding-bottom:78px;position:relative;}
+.topbar{
+  background:linear-gradient(160deg,var(--delft) 0%, var(--delft-deep) 100%);
+  color:#fff;padding:22px 20px 20px;position:relative;overflow:hidden;border-bottom:3px solid var(--ochre);
+}
+.topbar::after{content:"";position:absolute;inset:0;
+  background-image: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.06) 0, transparent 40%),
+                     radial-gradient(circle at 90% 80%, rgba(255,255,255,0.05) 0, transparent 45%);
+  pointer-events:none;}
+.brand{display:flex;align-items:baseline;gap:10px;position:relative;z-index:1;}
+.brand-mark{width:36px;height:36px;border-radius:9px;background:var(--porcelain);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:700;color:var(--delft);font-size:14px;flex-shrink:0;box-shadow: inset 0 0 0 2px var(--delft-pale);}
+h1.title{font-family:var(--font-display);font-weight:700;font-size:23px;margin:0;letter-spacing:0.2px;}
+.subtitle{font-size:12px;opacity:0.75;margin-top:2px;font-weight:500;letter-spacing:0.3px;}
+.stats-row{display:flex;gap:10px;margin-top:16px;position:relative;z-index:1;}
+.stat-pill{flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:9px 6px;text-align:center;}
+.stat-pill b{display:block;font-size:19px;font-family:var(--font-display);font-weight:700;}
+.stat-pill span{font-size:10.5px;opacity:0.75;text-transform:uppercase;letter-spacing:0.5px;}
+.stat-pill.new b{color:#EAF2FF;} .stat-pill.rep b{color:#FFE3B8;} .stat-pill.learned b{color:#C9F0D8;}
+main{flex:1;padding:18px 16px 8px;}
+.tabbar{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:#fff;border-top:1px solid var(--porcelain-2);display:flex;box-shadow: 0 -4px 18px rgba(18,41,77,0.08);z-index:20;}
+.tabbar button{flex:1;background:none;border:none;padding:9px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink-soft);font-family:var(--font-body);font-size:9.5px;font-weight:600;cursor:pointer;}
+.tabbar button .ic{font-size:17px;line-height:1;}
+.tabbar button.active{color:var(--delft);}
+.card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px;border:1px solid rgba(18,41,77,0.05);}
+.section-title{font-family:var(--font-display);font-weight:700;font-size:17px;margin:0 0 12px;color:var(--delft-deep);}
+.muted{color:var(--ink-soft);font-size:13.5px;line-height:1.5;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:11px;border:none;font-family:var(--font-body);font-weight:600;font-size:14.5px;cursor:pointer;width:100%;}
+.btn-primary{background:var(--delft);color:#fff;}
+.btn-primary:active{background:var(--delft-deep);}
+.btn-ghost{background:var(--porcelain-2);color:var(--ink);}
+.btn-outline{background:#fff;color:var(--delft);border:1.5px solid var(--delft-pale);}
+.btn-danger{background:#fff;color:var(--bad);border:1.5px solid #ecd0cb;}
+.btn:disabled{opacity:0.45;}
+.btn-row{display:flex;gap:10px;}
+.deck-wrap{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.progress-line{width:100%;display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-bottom:10px;font-weight:600;}
+.tile-card{width:100%;min-height:280px;background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:26px 22px;position:relative;display:flex;flex-direction:column;border:1px solid rgba(18,41,77,0.06);}
+.tile-card::before{content:"";position:absolute;top:10px;left:10px;right:10px;bottom:10px;border:1.5px solid var(--delft-pale);border-radius:12px;pointer-events:none;}
+.tile-corner{position:absolute;width:22px;height:22px;opacity:0.55;top:14px;left:14px;}
+.card-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px 6px;position:relative;z-index:1;}
+.article-badge{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--ochre-deep);background:#FCF1DC;border-radius:8px;padding:2px 10px;margin-bottom:8px;letter-spacing:0.5px;}
+.article-badge.de{color:var(--delft);background:#DCE9FA;}
+.article-badge.het{color:var(--ochre-deep);background:#FCEFD6;}
+.nl-word{font-family:var(--font-display);font-weight:700;font-size:34px;color:var(--delft-deep);line-height:1.15;}
+.pos-tag{font-size:11.5px;color:var(--ink-soft);margin-top:6px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;}
+.reveal-hint{font-size:12.5px;color:var(--ink-soft);margin-top:16px;}
+.back-block{width:100%;text-align:left;position:relative;z-index:1;}
+.tr-ru{font-size:22px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:4px;}
+.tr-en{font-size:14px;color:var(--ink-soft);text-align:center;margin-bottom:16px;}
+.mnemo-box{background:var(--porcelain);border-left:4px solid var(--ochre);border-radius:0 10px 10px 0;padding:11px 13px;margin-bottom:10px;}
+.mnemo-label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.6px;color:var(--ochre-deep);font-weight:700;margin-bottom:3px;}
+.mnemo-text{font-size:14.5px;font-weight:600;color:var(--ink);}
+.story-box{background:var(--delft-pale);border-radius:10px;padding:11px 13px;}
+.story-label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.6px;color:var(--delft-deep);font-weight:700;margin-bottom:3px;}
+.story-text{font-size:13.5px;line-height:1.5;color:var(--delft-deep);}
+.example-box{margin-top:10px;font-size:13px;color:var(--ink-soft);font-style:italic;background:#fbfaf6;border-radius:10px;padding:9px 12px;}
+.grade-row{display:flex;gap:8px;margin-top:14px;width:100%;}
+.grade-btn{flex:1;border:none;border-radius:11px;padding:12px 6px;font-family:var(--font-body);font-weight:700;font-size:13px;color:#fff;cursor:pointer;display:flex;flex-direction:column;gap:2px;align-items:center;}
+.grade-btn small{font-weight:500;font-size:10px;opacity:0.85;}
+.g-again{background:var(--bad);} .g-good{background:var(--delft-mid);} .g-easy{background:var(--good);}
+.empty-state{text-align:center;padding:50px 20px;color:var(--ink-soft);}
+.empty-state .big{font-size:40px;margin-bottom:10px;}
+label.field-label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin:14px 0 6px;text-transform:uppercase;letter-spacing:0.4px;}
+label.field-label:first-child{margin-top:0;}
+input[type=text], textarea, select{width:100%;padding:11px 13px;border-radius:10px;border:1.5px solid var(--porcelain-2);background:var(--porcelain);font-family:var(--font-body);font-size:14.5px;color:var(--ink);}
+textarea{resize:vertical;min-height:60px;}
+.seg{display:flex;gap:8px;}
+.seg button{flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--porcelain-2);background:#fff;font-weight:700;font-family:var(--font-display);font-size:14.5px;color:var(--ink-soft);cursor:pointer;}
+.seg button.sel{border-color:var(--delft);color:var(--delft);background:var(--delft-pale);}
+.search-bar{position:relative;margin-bottom:12px;}
+.search-bar input{padding-left:36px;}
+.search-ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:15px;}
+.word-row{display:flex;align-items:center;justify-content:space-between;padding:12px 4px;border-bottom:1px solid var(--porcelain-2);cursor:pointer;}
+.word-row:last-child{border-bottom:none;}
+.wr-left{display:flex;flex-direction:column;}
+.wr-nl{font-weight:700;font-size:15px;}
+.wr-ru{font-size:12.5px;color:var(--ink-soft);}
+.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.3px;}
+.badge.new{background:#E9EEF7;color:var(--delft-mid);}
+.badge.learning{background:#FCEFD6;color:var(--ochre-deep);}
+.badge.review{background:#E3F1E9;color:var(--good);}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--porcelain-2);}
+.setting-row:last-child{border-bottom:none;}
+.setting-label{font-weight:600;font-size:14.5px;}
+.setting-desc{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+.number-stepper{display:flex;align-items:center;gap:12px;}
+.number-stepper button{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--porcelain-2);background:#fff;font-size:17px;font-weight:700;color:var(--delft);cursor:pointer;}
+.number-stepper b{min-width:24px;text-align:center;font-family:var(--font-display);font-size:16px;}
+.toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:var(--delft-deep);color:#fff;padding:11px 18px;border-radius:30px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s, transform 0.25s; max-width:88%; text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+.hidden{display:none !important;}
+.top-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.icon-btn{background:none;border:none;font-size:20px;color:var(--delft);cursor:pointer;padding:4px 8px;}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.chip{padding:7px 13px;border-radius:20px;background:#fff;border:1.5px solid var(--porcelain-2);font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;}
+.chip.sel{background:var(--delft);border-color:var(--delft);color:#fff;}
+footer.appfoot{text-align:center;font-size:11.5px;color:var(--ink-soft);padding:16px 20px 6px;line-height:1.5;}
+.offline-banner{background:#FCEFD6;color:var(--ochre-deep);font-size:12px;font-weight:600;text-align:center;padding:7px 10px;border-radius:10px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">TM</div>
+      <div>
+        <h1 class="title">TM Easy Dutch</h1>
+        <div class="subtitle" id="subtitleEl">Nederlands · offline</div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-pill rep"><b id="statRep">0</b><span id="statRepLbl">повторить</span></div>
+      <div class="stat-pill new"><b id="statNew">0</b><span id="statNewLbl">новых</span></div>
+      <div class="stat-pill learned"><b id="statLearned">0</b><span id="statLearnedLbl">выучено</span></div>
+    </div>
+  </div>
+  <main id="main"></main>
+  <div class="toast" id="toast"></div>
+  <div class="tabbar">
+    <button data-tab="study" class="active"><span class="ic">📖</span><span class="lbl">Учить</span></button>
+    <button data-tab="words"><span class="ic">🗂️</span><span class="lbl">Слова</span></button>
+    <button data-tab="add"><span class="ic">➕</span><span class="lbl">Добавить</span></button>
+    <button data-tab="anchor"><span class="ic">🧩</span><span class="lbl">Тест</span></button>
+    <button data-tab="dehet"><span class="ic">🎯</span><span class="lbl">de·het</span></button>
+    <button data-tab="settings"><span class="ic">⚙️</span><span class="lbl">Ещё</span></button>
+  </div>
+</div>
+<script>
+/* ================= STATIC WORD DATA (pre-generated, works fully offline) ================= */
+const DUTCH_WORDS = [{"nl":"verstaan","article":null,"en":"to understand","ru":"понимать","pos":"verb","level":"b1","mnemonic":"«ферстаан» — «в стан» встал и понял","story":"Встал в СТРОй и наконец всё понял — verstaan, «понимать».","example_nl":"Ik versta je niet.","example_ru":"Я тебя не понимаю.","example_en":"I don't understand you.","id":"w_verstaan","batch":1},{"nl":"lezen","article":null,"en":"to read","ru":"читать","pos":"verb","level":"a2","mnemonic":"«лэйзен» созвучно с «лезть» в книгу","story":"ЛЕЗешь с головой в книгу — lezen, «читать».","example_nl":"Ik lees elke avond een boek.","example_ru":"Я читаю книгу каждый вечер.","example_en":"I read a book every evening.","id":"w_lezen","batch":1},{"nl":"schrijven","article":null,"en":"to write","ru":"писать","pos":"verb","level":"a2","mnemonic":"«схрайвен» — как «шрайбен» (нем. писать), скрипит перо","story":"Перо СКРИПит по бумаге — schrijven, «писать».","example_nl":"Ik schrijf een brief.","example_ru":"Я пишу письмо.","example_en":"I am writing a letter.","id":"w_schrijven","batch":1},{"nl":"luisteren","article":null,"en":"to listen","ru":"слушать","pos":"verb","level":"a2","mnemonic":"«лёйстерен» созвучно с «люстра» — слушаешь, глядя на люстру","story":"Сидишь, слушаешь музыку и глядишь на ЛЮСТРУ — luisteren.","example_nl":"Ik luister naar de radio.","example_ru":"Я слушаю радио.","example_en":"I am listening to the radio.","id":"w_luisteren","batch":1},{"nl":"proberen","article":null,"en":"to try","ru":"пробовать","pos":"verb","level":"a2","mnemonic":"«пробэрен» — почти «пробовать» без изменений","story":"Слово почти как русское «пробовать» — proberen, легко запомнить.","example_nl":"Probeer dit gerecht eens.","example_ru":"Попробуй это блюдо.","example_en":"Try this dish.","id":"w_proberen","batch":1},{"nl":"vinden","article":null,"en":"to find, to think (opinion)","ru":"находить, считать","pos":"verb","level":"a2","mnemonic":"«финден» — как «финт», нашёл лазейку","story":"Хитрый ФИНТ — и вот, ты нашёл решение — vinden, «находить».","example_nl":"Ik vind dit boek interessant.","example_ru":"Я нахожу эту книгу интересной.","example_en":"I find this book interesting.","id":"w_vinden","batch":1},{"nl":"zoeken","article":null,"en":"to search, to look for","ru":"искать","pos":"verb","level":"a2","mnemonic":"«зукен» созвучно с «сук» (базар) — ищешь товар на суке","story":"Ходишь по СУКу (восточному рынку) и ищешь редкий товар — zoeken.","example_nl":"Ik zoek mijn sleutels.","example_ru":"Я ищу свои ключи.","example_en":"I am looking for my keys.","id":"w_zoeken","batch":1},{"nl":"kopen","article":null,"en":"to buy","ru":"покупать","pos":"verb","level":"a2","mnemonic":"«копен» — как «купон» на скидку","story":"С КУПОНом на скидку идёшь покупать — kopen.","example_nl":"Ik koop brood bij de bakker.","example_ru":"Я покупаю хлеб у пекаря.","example_en":"I buy bread at the baker's.","id":"w_kopen","batch":1},{"nl":"betalen","article":null,"en":"to pay","ru":"платить","pos":"verb","level":"a2","mnemonic":"«бэталeн» — созвучно с «пи-та-лa» талоны","story":"Отдаёшь ТАЛОНы (деньги) в кассе — betalen, «платить».","example_nl":"Kan ik met kaart betalen?","example_ru":"Могу я заплатить картой?","example_en":"Can I pay by card?","id":"w_betalen","batch":1},{"nl":"helpen","article":null,"en":"to help","ru":"помогать","pos":"verb","level":"a2","mnemonic":"«хэлпен» — почти английское help","story":"«Help!» — кричит тонущий, ты бросаешься на помощь — helpen.","example_nl":"Kun je me helpen?","example_ru":"Ты можешь мне помочь?","example_en":"Can you help me?","id":"w_helpen","batch":1},{"nl":"vragen","article":null,"en":"to ask","ru":"спрашивать, просить","pos":"verb","level":"a2","mnemonic":"«фрахен» созвучно с «враг» — задаёшь вопрос врагу","story":"На допросе ВРАГу задают вопросы — vragen, «спрашивать».","example_nl":"Mag ik iets vragen?","example_ru":"Можно кое-что спросить?","example_en":"May I ask something?","id":"w_vragen","batch":1},{"nl":"antwoorden","article":null,"en":"to answer","ru":"отвечать","pos":"verb","level":"b1","mnemonic":"«антвордэн» — «ответ» + «ворд» (слово)","story":"«ОТВЕТное слово» дословно — antwoorden, «отвечать».","example_nl":"Ze antwoordde snel.","example_ru":"Она быстро ответила.","example_en":"She answered quickly.","id":"w_antwoorden","batch":1},{"nl":"geloven","article":null,"en":"to believe","ru":"верить","pos":"verb","level":"b1","mnemonic":"«хэловен» созвучно с «голова» веры полна","story":"ГОЛОВА полна веры — geloven, «верить».","example_nl":"Ik geloof je niet.","example_ru":"Я тебе не верю.","example_en":"I don't believe you.","id":"w_geloven","batch":1},{"nl":"hopen","article":null,"en":"to hope","ru":"надеяться","pos":"verb","level":"b1","mnemonic":"«хопен» — как «хоп!» с надеждой прыгнуть","story":"«Хоп!» — прыгаешь с надеждой на удачу — hopen.","example_nl":"Ik hoop op mooi weer.","example_ru":"Я надеюсь на хорошую погоду.","example_en":"I hope for nice weather.","id":"w_hopen","batch":1},{"nl":"ontmoeten","article":null,"en":"to meet","ru":"встречать","pos":"verb","level":"b1","mnemonic":"«онтмутен» — «он» + «мутить» встречу","story":"«Он мутит встречу» — вот и ontmoeten, «встречать».","example_nl":"Ik ontmoet mijn vriend in het park.","example_ru":"Я встречаю друга в парке.","example_en":"I am meeting my friend in the park.","id":"w_ontmoeten","batch":1},{"nl":"bezoeken","article":null,"en":"to visit","ru":"посещать","pos":"verb","level":"b1","mnemonic":"«бэзукен» созвучно с «базука» в гости","story":"Приходишь в гости с БАЗУКОй игрушечной — bezoeken, «посещать».","example_nl":"We bezoeken oma in het weekend.","example_ru":"Мы навещаем бабушку на выходных.","example_en":"We visit grandma on the weekend.","id":"w_bezoeken","batch":1},{"nl":"reizen","article":null,"en":"to travel","ru":"путешествовать","pos":"verb","level":"a2","mnemonic":"«рэйзен» созвучно с «рейс» (авиарейс)","story":"Садишься на РЕЙС и летишь — reizen, «путешествовать».","example_nl":"Ik reis graag door Europa.","example_ru":"Я люблю путешествовать по Европе.","example_en":"I like to travel through Europe.","id":"w_reizen","batch":1},{"nl":"rijden","article":null,"en":"to drive, to ride","ru":"ехать (за рулём)","pos":"verb","level":"a2","mnemonic":"«рэйден» созвучно с «рейд» на машине","story":"Устраиваешь автомобильный РЕЙД по городу — rijden, «ехать».","example_nl":"Hij rijdt te snel.","example_ru":"Он едет слишком быстро.","example_en":"He is driving too fast.","id":"w_rijden","batch":1},{"nl":"verliezen","article":null,"en":"to lose","ru":"терять, проигрывать","pos":"verb","level":"b1","mnemonic":"«ферлизен» созвучно с «в лужу сел» — проиграл","story":"«Сел в лужу» — то есть проиграл — verliezen.","example_nl":"Ik verlies altijd mijn sleutels.","example_ru":"Я всегда теряю ключи.","example_en":"I always lose my keys.","id":"w_verliezen","batch":1},{"nl":"openen","article":null,"en":"to open","ru":"открывать","pos":"verb","level":"a2","mnemonic":"«опенен» почти как «open» по-английски","story":"«Open sesame!» — и дверь открывается — openen.","example_nl":"Kun je het raam openen?","example_ru":"Можешь открыть окно?","example_en":"Can you open the window?","id":"w_openen","batch":1},{"nl":"sluiten","article":null,"en":"to close","ru":"закрывать","pos":"verb","level":"a2","mnemonic":"«слёйтен» созвучно со «слюда» — закрыть окно от сквозняка","story":"Закрываешь окно слюдяной рамой от сквозняка — sluiten.","example_nl":"De winkel sluit om acht uur.","example_ru":"Магазин закрывается в восемь.","example_en":"The shop closes at eight.","id":"w_sluiten","batch":1},{"nl":"stoppen","article":null,"en":"to stop","ru":"останавливаться","pos":"verb","level":"a2","mnemonic":"«стоппен» — почти русское «стоп»","story":"«Стоп!» — кричит регулировщик — stoppen, «останавливаться».","example_nl":"De bus stopt hier.","example_ru":"Автобус останавливается здесь.","example_en":"The bus stops here.","id":"w_stoppen","batch":1},{"nl":"betekenen","article":null,"en":"to mean","ru":"значить","pos":"verb","level":"b1","mnemonic":"«бэтэйкенен» — «те кен» знак, что значит","story":"«Тот знак» подсказывает, что значит слово — betekenen.","example_nl":"Wat betekent dit woord?","example_ru":"Что значит это слово?","example_en":"What does this word mean?","id":"w_betekenen","batch":1},{"nl":"buurman","article":"de","en":"neighbor (male)","ru":"сосед","pos":"noun","level":"b1","mnemonic":"«буур» (сосед) + «ман» (мужчина)","story":"«БУРный мужик» живёт по соседству — buurman, «сосед».","example_nl":"Onze buurman is heel aardig.","example_ru":"Наш сосед очень приятный.","example_en":"Our neighbor is very nice.","id":"w_buurman","batch":1},{"nl":"collega","article":"de","en":"colleague","ru":"коллега","pos":"noun","level":"b1","mnemonic":"звучит почти так же, как «коллега» по-русски","story":"Слово collega не нужно даже переводить.","example_nl":"Mijn collega helpt me graag.","example_ru":"Мой коллега с радостью мне помогает.","example_en":"My colleague gladly helps me.","id":"w_collega","batch":1},{"nl":"recept","article":"het","en":"recipe","ru":"рецепт","pos":"noun","level":"b1","mnemonic":"звучит почти как «рецепт»","story":"Recept — почти русское «рецепт».","example_nl":"Heb je een recept voor appeltaart?","example_ru":"У тебя есть рецепт яблочного пирога?","example_en":"Do you have a recipe for apple pie?","id":"w_recept","batch":1},{"nl":"soms","article":null,"en":"sometimes","ru":"иногда","pos":"adv","level":"b1","mnemonic":"«сомс» созвучно с «сом» плывущий иногда наверх","story":"СОМ иногда всплывает наверх — soms, «иногда».","example_nl":"Soms ga ik hardlopen.","example_ru":"Иногда я бегаю.","example_en":"Sometimes I go running.","id":"w_soms","batch":1},{"nl":"vakantie","article":"de","en":"vacation","ru":"отпуск, каникулы","pos":"noun","level":"a2","mnemonic":"звучит почти как «вакансия» — свободное место в графике","story":"Свободное место в графике, как ВАКАНСИЯ — vakantie, «отпуск».","example_nl":"We gaan op vakantie naar Spanje.","example_ru":"Мы едем в отпуск в Испанию.","example_en":"We are going on vacation to Spain.","id":"w_vakantie","batch":1},{"nl":"baan","article":"de","en":"job","ru":"работа, должность","pos":"noun","level":"b1","mnemonic":"«баан» созвучно с «банан» — сладкая работа мечты","story":"Работа мечты сладкая, как БАНАН — baan.","example_nl":"Ze heeft een nieuwe baan gevonden.","example_ru":"Она нашла новую работу.","example_en":"She found a new job.","id":"w_baan","batch":1},{"nl":"baas","article":"de","en":"boss","ru":"начальник","pos":"noun","level":"a2","mnemonic":"звучит почти как «босс»","story":"Baas почти совпадает со словом «босс».","example_nl":"Mijn baas is streng maar eerlijk.","example_ru":"Мой начальник строгий, но справедливый.","example_en":"My boss is strict but fair.","id":"w_baas","batch":1},{"nl":"universiteit","article":"de","en":"university","ru":"университет","pos":"noun","level":"a2","mnemonic":"звучит почти так же, как «университет»","story":"Universiteit почти не отличается от «университет».","example_nl":"Ze studeert aan de universiteit.","example_ru":"Она учится в университете.","example_en":"She studies at the university.","id":"w_universiteit","batch":1},{"nl":"cursus","article":"de","en":"course","ru":"курс (обучение)","pos":"noun","level":"b1","mnemonic":"звучит почти как «курс»","story":"Cursus созвучно с русским «курс».","example_nl":"Ik volg een cursus Nederlands.","example_ru":"Я прохожу курс нидерландского.","example_en":"I am taking a Dutch course.","id":"w_cursus","batch":1},{"nl":"examen","article":"het","en":"exam","ru":"экзамен","pos":"noun","level":"a2","mnemonic":"звучит почти как «экзамен»","story":"Examen почти совпадает с «экзамен».","example_nl":"Morgen heb ik een examen.","example_ru":"Завтра у меня экзамен.","example_en":"Tomorrow I have an exam.","id":"w_examen","batch":1},{"nl":"huiswerk","article":"het","en":"homework","ru":"домашнее задание","pos":"noun","level":"a2","mnemonic":"«хёйс» (дом) + «верк» (работа) = домашняя работа","story":"«Домашняя работа» дословно — huiswerk.","example_nl":"Heb je je huiswerk al gemaakt?","example_ru":"Ты уже сделал домашнее задание?","example_en":"Have you done your homework yet?","id":"w_huiswerk","batch":1},{"nl":"verdrietig","article":null,"en":"sad","ru":"грустный","pos":"adj","level":"b1","mnemonic":"«фердритих» — «вер» + «дрит» созвучно с «дрожь» от слёз","story":"От грусти дрожат губы — verdrietig.","example_nl":"Ze is verdrietig om het nieuws.","example_ru":"Она грустит из-за новости.","example_en":"She is sad about the news.","id":"w_verdrietig","batch":1},{"nl":"gelukkig","article":null,"en":"happy, lucky","ru":"счастливый","pos":"adj","level":"b1","mnemonic":"«хелюкких» созвучно с «гулять» от счастья","story":"От счастья хочется весь день ГУЛЯть — gelukkig.","example_nl":"Ze is heel gelukkig met haar nieuwe baan.","example_ru":"Она очень счастлива со своей новой работой.","example_en":"She is very happy with her new job.","id":"w_gelukkig","batch":1},{"nl":"nerveus","article":null,"en":"nervous","ru":"нервный","pos":"adj","level":"b1","mnemonic":"звучит почти как «нервный»","story":"Nerveus совсем рядом со словом «нервный».","example_nl":"Ik ben nerveus voor het examen.","example_ru":"Я нервничаю перед экзаменом.","example_en":"I am nervous about the exam.","id":"w_nerveus","batch":1},{"nl":"trots","article":null,"en":"proud","ru":"гордый","pos":"adj","level":"b1","mnemonic":"«тротс» созвучно с «трость» — гордо опирается на трость","story":"Гордо опирается на ТРОСТь — trots.","example_nl":"Ik ben trots op je.","example_ru":"Я тобой горжусь.","example_en":"I am proud of you.","id":"w_trots","batch":1},{"nl":"teleurgesteld","article":null,"en":"disappointed","ru":"разочарованный","pos":"adj","level":"b2","mnemonic":"«телёрхестелд» — «тель» созвучно с «тщетно» ждал","story":"Тщетно ждал — и вот разочарование — teleurgesteld.","example_nl":"Hij was teleurgesteld in de uitslag.","example_ru":"Он был разочарован результатом.","example_en":"He was disappointed with the result.","id":"w_teleurgesteld","batch":1},{"nl":"langzaam","article":null,"en":"slow","ru":"медленный","pos":"adj","level":"a2","mnemonic":"«лангзаам» — «ланг» (долгий) + «заам» = долго тянется","story":"Тянется долго и медленно — langzaam.","example_nl":"De trein rijdt langzaam.","example_ru":"Поезд едет медленно.","example_en":"The train is moving slowly.","id":"w_langzaam","batch":1},{"nl":"makkelijk","article":null,"en":"easy","ru":"лёгкий","pos":"adj","level":"a2","mnemonic":"«маккелэйк» созвучно с «мак» — лёгкий, как маковое семечко","story":"Лёгкий, как маковое зёрнышко (мак) — makkelijk.","example_nl":"Deze oefening is makkelijk.","example_ru":"Это упражнение лёгкое.","example_en":"This exercise is easy.","id":"w_makkelijk","batch":1},{"nl":"moeilijk","article":null,"en":"difficult","ru":"сложный","pos":"adj","level":"a2","mnemonic":"«муйлэйк» созвучно с «муторно» — сложно и муторно","story":"Сложная задача — прямо МУТОРно — moeilijk.","example_nl":"Nederlands is soms moeilijk.","example_ru":"Нидерландский иногда сложный.","example_en":"Dutch is sometimes difficult.","id":"w_moeilijk","batch":1},{"nl":"belangrijk","article":null,"en":"important","ru":"важный","pos":"adj","level":"b1","mnemonic":"«бэлангрэйк» — «бе» + «ланг» (долгий) — важное тянется долго","story":"Важные дела тянутся ДОЛго (lang) — belangrijk.","example_nl":"Dit is een belangrijke beslissing.","example_ru":"Это важное решение.","example_en":"This is an important decision.","id":"w_belangrijk","batch":1},{"nl":"interessant","article":null,"en":"interesting","ru":"интересный","pos":"adj","level":"a2","mnemonic":"звучит так же, как «интересный»","story":"Interessant — почти то же слово, что и «интересный».","example_nl":"Dit boek is erg interessant.","example_ru":"Эта книга очень интересная.","example_en":"This book is very interesting.","id":"w_interessant","batch":1},{"nl":"duur","article":null,"en":"expensive","ru":"дорогой","pos":"adj","level":"a2","mnemonic":"«дюр» созвучно с «дюже» дорого","story":"«Дюже дорого!» — duur.","example_nl":"Dit restaurant is te duur.","example_ru":"Этот ресторан слишком дорогой.","example_en":"This restaurant is too expensive.","id":"w_duur","batch":1},{"nl":"goedkoop","article":null,"en":"cheap","ru":"дешёвый","pos":"adj","level":"b1","mnemonic":"«худкооп» — «худ» (хороший) + «кооп» (купля) = выгодная покупка","story":"Выгодная покупка — «хорошая купля» — goedkoop, «дешёвый».","example_nl":"Deze schoenen waren goedkoop.","example_ru":"Эти туфли были дешёвыми.","example_en":"These shoes were cheap.","id":"w_goedkoop","batch":1},{"nl":"mening","article":"de","en":"opinion","ru":"мнение","pos":"noun","level":"b1","mnemonic":"«менинг» созвучно с «мнение» напрямую","story":"Слово mening звучит почти как «мнение».","example_nl":"Wat is jouw mening hierover?","example_ru":"Какое твоё мнение об этом?","example_en":"What is your opinion on this?","id":"w_mening","batch":1},{"nl":"ervaring","article":"de","en":"experience","ru":"опыт","pos":"noun","level":"b1","mnemonic":"«эрвааринг» созвучно с «эра» — опыт целой эры жизни","story":"Опыт целой ЭРЫ жизни — ervaring.","example_nl":"Ik heb veel ervaring met dit werk.","example_ru":"У меня большой опыт в этой работе.","example_en":"I have a lot of experience with this work.","id":"w_ervaring","batch":1},{"nl":"gelegenheid","article":"de","en":"opportunity, occasion","ru":"возможность, случай","pos":"noun","level":"b2","mnemonic":"«хелэхенхейт» созвучно с «легенда» — легендарный шанс","story":"Легендарный шанс выпадает раз в жизни — gelegenheid.","example_nl":"Dit is een goede gelegenheid.","example_ru":"Это хорошая возможность.","example_en":"This is a good opportunity.","id":"w_gelegenheid","batch":1},{"nl":"mogelijkheid","article":"de","en":"possibility","ru":"возможность","pos":"noun","level":"b1","mnemonic":"от mogen (можно) — то, что возможно","story":"От mogen («можно») — mogelijkheid, «возможность».","example_nl":"Er zijn veel mogelijkheden.","example_ru":"Есть много возможностей.","example_en":"There are many possibilities.","id":"w_mogelijkheid","batch":1},{"nl":"verantwoordelijkheid","article":"de","en":"responsibility","ru":"ответственность","pos":"noun","level":"b2","mnemonic":"от antwoorden (отвечать) — то, за что отвечаешь","story":"От antwoorden («отвечать») — verantwoordelijkheid, «ответственность».","example_nl":"Dit is jouw verantwoordelijkheid.","example_ru":"Это твоя ответственность.","example_en":"This is your responsibility.","id":"w_verantwoordelijkheid","batch":1},{"nl":"gezondheid","article":"de","en":"health","ru":"здоровье","pos":"noun","level":"a2","mnemonic":"от gezond (здоровый) — состояние здоровья","story":"От gezond («здоровый») — gezondheid, «здоровье».","example_nl":"Gezondheid is het belangrijkste.","example_ru":"Здоровье — самое важное.","example_en":"Health is the most important thing.","id":"w_gezondheid","batch":1},{"nl":"veiligheid","article":"de","en":"safety","ru":"безопасность","pos":"noun","level":"b1","mnemonic":"«вэйлихейт» созвучно с «вейл» (парус) — безопасная гавань","story":"Тихая гавань под парусом (вейл) — veiligheid, «безопасность».","example_nl":"Veiligheid staat voorop.","example_ru":"Безопасность превыше всего.","example_en":"Safety comes first.","id":"w_veiligheid","batch":1},{"nl":"vrijheid","article":"de","en":"freedom","ru":"свобода","pos":"noun","level":"b1","mnemonic":"от vrij (свободный) — состояние свободы","story":"От vrij («свободный») — vrijheid, «свобода».","example_nl":"Vrijheid is heel belangrijk voor mij.","example_ru":"Свобода очень важна для меня.","example_en":"Freedom is very important to me.","id":"w_vrijheid","batch":1},{"nl":"cultuur","article":"de","en":"culture","ru":"культура","pos":"noun","level":"b1","mnemonic":"звучит почти так же, как «культура»","story":"Cultuur почти совпадает со словом «культура».","example_nl":"Nederlandse cultuur is interessant.","example_ru":"Голландская культура интересна.","example_en":"Dutch culture is interesting.","id":"w_cultuur","batch":1},{"nl":"toekomst","article":"de","en":"future","ru":"будущее","pos":"noun","level":"b1","mnemonic":"«тукомст» — «ту» (к) + «комст» (приход) = то, что придёт","story":"«То, что придёт (komen)» — toekomst, «будущее».","example_nl":"Wat wil je in de toekomst doen?","example_ru":"Что ты хочешь делать в будущем?","example_en":"What do you want to do in the future?","id":"w_toekomst","batch":1},{"nl":"verleden","article":"het","en":"past","ru":"прошлое","pos":"noun","level":"b1","mnemonic":"«ферлэйден» созвучно с «в лето давнее» — прошлое лето","story":"«В лето давнее» вспоминаешь — verleden, «прошлое».","example_nl":"In het verleden woonde ik in Berlijn.","example_ru":"В прошлом я жил в Берлине.","example_en":"In the past I lived in Berlin.","id":"w_verleden","batch":1},{"nl":"resultaat","article":"het","en":"result","ru":"результат","pos":"noun","level":"b1","mnemonic":"звучит почти так же, как «результат»","story":"Resultaat почти не отличается от «результат».","example_nl":"Het resultaat was goed.","example_ru":"Результат был хорошим.","example_en":"The result was good.","id":"w_resultaat","batch":1},{"nl":"oplossing","article":"de","en":"solution","ru":"решение","pos":"noun","level":"b1","mnemonic":"«оплоссинг» — от «los» (свободный) — распутать проблему","story":"«Распутать (los)» проблему — oplossing, «решение».","example_nl":"We hebben een oplossing gevonden.","example_ru":"Мы нашли решение.","example_en":"We found a solution.","id":"w_oplossing","batch":1},{"nl":"probleem","article":"het","en":"problem","ru":"проблема","pos":"noun","level":"a2","mnemonic":"звучит так же, как «проблема»","story":"Probleem — то же слово, что и «проблема».","example_nl":"We hebben een klein probleem.","example_ru":"У нас небольшая проблема.","example_en":"We have a small problem.","id":"w_probleem","batch":1},{"nl":"situatie","article":"de","en":"situation","ru":"ситуация","pos":"noun","level":"b1","mnemonic":"звучит почти так же, как «ситуация»","story":"Situatie почти совпадает со словом «ситуация».","example_nl":"De situatie is moeilijk.","example_ru":"Ситуация сложная.","example_en":"The situation is difficult.","id":"w_situatie","batch":1},{"nl":"verschil","article":"het","en":"difference","ru":"разница, отличие","pos":"noun","level":"b1","mnemonic":"«ферсхил» созвучно с «в схил»(схватка) — разница мнений в споре","story":"В горячем споре видна разница мнений — verschil.","example_nl":"Wat is het verschil tussen deze twee?","example_ru":"В чём разница между этими двумя?","example_en":"What's the difference between these two?","id":"w_verschil","batch":1},{"nl":"voordeel","article":"het","en":"advantage","ru":"преимущество","pos":"noun","level":"b1","mnemonic":"«вор» (перед) + «деел» (часть) = то, что впереди","story":"«Впереди часть» выгоды — voordeel, «преимущество».","example_nl":"Dat is een groot voordeel.","example_ru":"Это большое преимущество.","example_en":"That is a big advantage.","id":"w_voordeel","batch":1},{"nl":"nadeel","article":"het","en":"disadvantage","ru":"недостаток","pos":"noun","level":"b1","mnemonic":"«на» (после) + «деел» (часть) = то, что после, минус","story":"«После часть», минус — nadeel, «недостаток».","example_nl":"Elke keuze heeft voor- en nadelen.","example_ru":"У каждого выбора есть плюсы и минусы.","example_en":"Every choice has advantages and disadvantages.","id":"w_nadeel","batch":1},{"nl":"doel","article":"het","en":"goal, purpose","ru":"цель","pos":"noun","level":"b1","mnemonic":"«дул» созвучно со словом «дуло» — цель, куда смотрит дуло","story":"Прицел смотрит точно в цель — doel.","example_nl":"Mijn doel is om Nederlands te leren.","example_ru":"Моя цель — выучить нидерландский.","example_en":"My goal is to learn Dutch.","id":"w_doel","batch":1},{"nl":"reden","article":"de","en":"reason","ru":"причина","pos":"noun","level":"b1","mnemonic":"«рэйден» созвучно с «резон» — есть резон, есть причина","story":"Есть РЕЗОн — есть и причина — reden.","example_nl":"Wat is de reden voor je vertraging?","example_ru":"В чём причина твоего опоздания?","example_en":"What is the reason for your delay?","id":"w_reden","batch":1},{"nl":"verandering","article":"de","en":"change","ru":"изменение","pos":"noun","level":"b1","mnemonic":"от «anders» (другой) — переход к другому","story":"От anders («другой») — verandering, «изменение».","example_nl":"Er komt een grote verandering.","example_ru":"Грядёт большое изменение.","example_en":"A big change is coming.","id":"w_verandering","batch":1},{"nl":"natuur","article":"de","en":"nature","ru":"природа","pos":"noun","level":"a2","mnemonic":"звучит почти как «натура»","story":"Natuur созвучно с русским «натура» — «природа».","example_nl":"Ik hou van de natuur.","example_ru":"Я люблю природу.","example_en":"I love nature.","id":"w_natuur","batch":1},{"nl":"ziekte","article":"de","en":"illness","ru":"болезнь","pos":"noun","level":"b1","mnemonic":"от ziek (больной) — состояние болезни","story":"От ziek («больной») — ziekte, «болезнь».","example_nl":"Griep is een veelvoorkomende ziekte.","example_ru":"Грипп — распространённая болезнь.","example_en":"Flu is a common illness.","id":"w_ziekte","batch":1},{"nl":"medicijn","article":"het","en":"medicine","ru":"лекарство","pos":"noun","level":"b1","mnemonic":"звучит почти как «медицина»","story":"Medicijn созвучно со словом «медицина».","example_nl":"Neem je medicijnen elke dag.","example_ru":"Принимай лекарства каждый день.","example_en":"Take your medicine every day.","id":"w_medicijn","batch":1},{"nl":"daarom","article":null,"en":"therefore, that's why","ru":"поэтому","pos":"adv","level":"b1","mnemonic":"«дааром» — «даар» (там) + «ом» (вокруг) = вокруг того","story":"«Вокруг того» — вот причина, daarom, «поэтому».","example_nl":"Het regent, daarom blijf ik thuis.","example_ru":"Идёт дождь, поэтому я остаюсь дома.","example_en":"It's raining, that's why I'm staying home.","id":"w_daarom","batch":1},{"nl":"toch","article":null,"en":"still, yet, after all","ru":"всё же","pos":"adv","level":"b1","mnemonic":"«тох» созвучно с «точно» — всё же, точно так","story":"«Всё же, точно так и будет» — toch.","example_nl":"Het is duur, maar ik koop het toch.","example_ru":"Это дорого, но я всё равно куплю.","example_en":"It's expensive, but I'll buy it anyway.","id":"w_toch","batch":1},{"nl":"eigenlijk","article":null,"en":"actually","ru":"на самом деле","pos":"adv","level":"b1","mnemonic":"от eigen (собственный) — по сути, собственно говоря","story":"«Собственно говоря» — eigenlijk, «на самом деле».","example_nl":"Eigenlijk heb ik geen tijd.","example_ru":"На самом деле у меня нет времени.","example_en":"Actually, I don't have time.","id":"w_eigenlijk","batch":1},{"nl":"misschien","article":null,"en":"maybe","ru":"может быть","pos":"adv","level":"a2","mnemonic":"«мисхен» созвучно с «мисс, шанс есть» — может быть, повезёт","story":"«Мисс, шанс есть» — а вдруг получится — misschien, «может быть».","example_nl":"Misschien kom ik later.","example_ru":"Может быть, я приду позже.","example_en":"Maybe I'll come later.","id":"w_misschien","batch":1},{"nl":"natuurlijk","article":null,"en":"of course, naturally","ru":"конечно","pos":"adv","level":"a2","mnemonic":"от natuur (природа) — естественно, конечно","story":"От natuur («природа») — natuurlijk, «конечно, естественно».","example_nl":"Natuurlijk help ik je.","example_ru":"Конечно, я тебе помогу.","example_en":"Of course I'll help you.","id":"w_natuurlijk","batch":1},{"nl":"helaas","article":null,"en":"unfortunately","ru":"к сожалению","pos":"adv","level":"b1","mnemonic":"«хэлаас» созвучно с «увы, аллас» (alas по-англ.)","story":"«Увы!» (alas) — helaas, «к сожалению».","example_nl":"Helaas kan ik niet komen.","example_ru":"К сожалению, я не могу прийти.","example_en":"Unfortunately, I can't come.","id":"w_helaas","batch":1},{"nl":"bijvoorbeeld","article":null,"en":"for example","ru":"например","pos":"adv","level":"b1","mnemonic":"«бэй» (при) + «воорбеелд» (пример) = при примере","story":"«При примере» — bijvoorbeeld, «например».","example_nl":"Neem bijvoorbeeld deze auto.","example_ru":"Возьмём, например, эту машину.","example_en":"Take, for example, this car.","id":"w_bijvoorbeeld","batch":1},{"nl":"ondanks","article":null,"en":"despite","ru":"несмотря на","pos":"prep","level":"b2","mnemonic":"«ондankс» — «он» + «данкс» созвучно с «данке» (спасибо), но не благодаря, а вопреки","story":"Не благодаря (danken), а вопреки — ondanks, «несмотря на».","example_nl":"Ondanks de regen gingen we wandelen.","example_ru":"Несмотря на дождь, мы пошли гулять.","example_en":"Despite the rain, we went for a walk.","id":"w_ondanks","batch":1},{"nl":"hoewel","article":null,"en":"although","ru":"хотя","pos":"conj","level":"b1","mnemonic":"«хувел» — «хоу» + «вел» созвучно с «хоть» и «вол»я — хоть и вопреки","story":"«Хоть и...» — hoewel, «хотя».","example_nl":"Hoewel het koud was, gingen we zwemmen.","example_ru":"Хотя было холодно, мы пошли плавать.","example_en":"Although it was cold, we went swimming.","id":"w_hoewel","batch":1},{"nl":"terwijl","article":null,"en":"while","ru":"пока, в то время как","pos":"conj","level":"b1","mnemonic":"«тервейл» — «тер» + «вейл» созвучно с «время» — пока идёт время","story":"«Пока идёт ВРЕМЯ» — terwijl.","example_nl":"Ik luister naar muziek terwijl ik werk.","example_ru":"Я слушаю музыку, пока работаю.","example_en":"I listen to music while I work.","id":"w_terwijl","batch":1},{"nl":"besluiten","article":null,"en":"to decide","ru":"решать (принять решение)","pos":"verb","level":"b1","mnemonic":"«бэслёйтен» созвучно с «без слюней» — решить твёрдо, без сантиментов","story":"Начальник стучит по столу: «Хватит сюсюкать, решаем без слюней!» — besluiten, «решать».","example_nl":"We besluiten morgen te vertrekken.","example_ru":"Мы решаем уехать завтра.","example_en":"We decide to leave tomorrow.","id":"w_besluiten","batch":2},{"nl":"veranderen","article":null,"en":"to change","ru":"изменяться, менять","pos":"verb","level":"b1","mnemonic":"«ферандерен» — «вер» + «андерен» созвучно с «в other» (другой)","story":"Превращаешься в кого-то ДРУГОГО (ander) — veranderen, «меняться».","example_nl":"Het weer verandert snel.","example_ru":"Погода быстро меняется.","example_en":"The weather changes quickly.","id":"w_veranderen","batch":2},{"nl":"ontwikkelen","article":null,"en":"to develop","ru":"развивать(ся)","pos":"verb","level":"b1","mnemonic":"«онтвиккелен» созвучно с «он вики лепит» — развивает статью в вики","story":"«Он в Вики лепит новую версию статьи» — ontwikkelen, «развивать».","example_nl":"Het bedrijf ontwikkelt een nieuwe app.","example_ru":"Компания разрабатывает новое приложение.","example_en":"The company is developing a new app.","id":"w_ontwikkelen","batch":2},{"nl":"vermijden","article":null,"en":"to avoid","ru":"избегать","pos":"verb","level":"b1","mnemonic":"«фермэйден» созвучно с «в мыле» бежать, лишь бы избежать","story":"Бежишь весь в мыле, лишь бы избежать встречи — vermijden.","example_nl":"Ik probeer suiker te vermijden.","example_ru":"Я стараюсь избегать сахара.","example_en":"I try to avoid sugar.","id":"w_vermijden","batch":2},{"nl":"toestaan","article":null,"en":"to allow, to permit","ru":"разрешать","pos":"verb","level":"b1","mnemonic":"«тустаан» — «ту» + «стаан» (стоять) — разрешить встать в очередь","story":"Охранник разрешает встать (staan) в очередь — toestaan, «разрешать».","example_nl":"Mijn ouders staan het niet toe.","example_ru":"Мои родители это не разрешают.","example_en":"My parents don't allow it.","id":"w_toestaan","batch":2},{"nl":"weigeren","article":null,"en":"to refuse","ru":"отказываться","pos":"verb","level":"b1","mnemonic":"«вэйхерен» созвучно с «выйграть» отказ — принципиально отказываешься","story":"Принципиально отказываешься, чтобы «выйграть» спор — weigeren.","example_nl":"Hij weigert te betalen.","example_ru":"Он отказывается платить.","example_en":"He refuses to pay.","id":"w_weigeren","batch":2},{"nl":"controleren","article":null,"en":"to check, to control","ru":"проверять, контролировать","pos":"verb","level":"a2","mnemonic":"звучит почти так же, как «контролировать»","story":"Controleren почти не отличается от «контролировать».","example_nl":"Kun je mijn huiswerk controleren?","example_ru":"Можешь проверить моё домашнее задание?","example_en":"Can you check my homework?","id":"w_controleren","batch":2},{"nl":"herinneren","article":null,"en":"to remember, to remind","ru":"напоминать, вспоминать","pos":"verb","level":"b1","mnemonic":"«хэриннерен» — «хер» + «иннерен» созвучно с «внутренний» — хранишь внутри память","story":"Хранишь память глубоко ВНУТРИ (innerlijk) — herinneren, «вспоминать».","example_nl":"Dit herinnert me aan mijn jeugd.","example_ru":"Это напоминает мне о моём детстве.","example_en":"This reminds me of my childhood.","id":"w_herinneren","batch":2},{"nl":"vergeten","article":null,"en":"to forget","ru":"забывать","pos":"verb","level":"a2","mnemonic":"«фэрхэтен» созвучно с «вергетон» — забыл, как этот забавный жетон называется","story":"Забыл, куда дел жетон (neteton) — vergeten, «забывать».","example_nl":"Ik ben mijn wachtwoord vergeten.","example_ru":"Я забыл свой пароль.","example_en":"I forgot my password.","id":"w_vergeten","batch":2},{"nl":"voorstellen","article":null,"en":"to suggest, to propose, to introduce","ru":"предлагать, представлять (кого-то)","pos":"verb","level":"b1","mnemonic":"«вор» (перед) + «стеллен» (ставить) — поставить предложение перед всеми","story":"Ставишь идею ПЕРЕД (voor) всеми на обсуждение — voorstellen, «предлагать».","example_nl":"Ik stel voor om te stoppen.","example_ru":"Я предлагаю остановиться.","example_en":"I suggest we stop.","id":"w_voorstellen","batch":2},{"nl":"verwachten","article":null,"en":"to expect","ru":"ожидать","pos":"verb","level":"b1","mnemonic":"«ферваххтен» — «вер» + «вахтен» (ждать) — ждать с нетерпением, ожидать","story":"От wachten («ждать») с приставкой — verwachten, «ожидать».","example_nl":"Ik verwacht een pakket vandaag.","example_ru":"Я жду посылку сегодня.","example_en":"I am expecting a package today.","id":"w_verwachten","batch":2},{"nl":"waarderen","article":null,"en":"to appreciate","ru":"ценить","pos":"verb","level":"b1","mnemonic":"звучит почти как «вардировать» — ценить, будто оценивать по вардовой шкале","story":"Оцениваешь по особой шкале и очень ценишь — waarderen.","example_nl":"Ik waardeer je hulp echt.","example_ru":"Я правда ценю твою помощь.","example_en":"I really appreciate your help.","id":"w_waarderen","batch":2},{"nl":"verdienen","article":null,"en":"to earn, to deserve","ru":"зарабатывать, заслуживать","pos":"verb","level":"b1","mnemonic":"«фердинен» созвучно с «вертеть деньги» — зарабатывать, вертя дела","story":"Вертишься целый день, чтобы заработать — verdienen.","example_nl":"Hij verdient goed geld.","example_ru":"Он хорошо зарабатывает.","example_en":"He earns good money.","id":"w_verdienen","batch":2},{"nl":"ontdekken","article":null,"en":"to discover","ru":"обнаруживать, открывать (научно)","pos":"verb","level":"b1","mnemonic":"«онтдэккен» — «онт» + «деккен» (накрывать) — снять покрывало и обнаружить","story":"Снимаешь покрывало (dekken) и обнаруживаешь секрет — ontdekken, «открывать».","example_nl":"Wetenschappers ontdekten een nieuwe planeet.","example_ru":"Учёные открыли новую планету.","example_en":"Scientists discovered a new planet.","id":"w_ontdekken","batch":2},{"nl":"beschrijven","article":null,"en":"to describe","ru":"описывать","pos":"verb","level":"b1","mnemonic":"«бэ» + «схрайвен» (писать) — писать вокруг темы, описывать","story":"От schrijven («писать») с приставкой be- — beschrijven, «описывать».","example_nl":"Kun je de dief beschrijven?","example_ru":"Можешь описать вора?","example_en":"Can you describe the thief?","id":"w_beschrijven","batch":2},{"nl":"voorzichtig","article":null,"en":"careful","ru":"осторожный","pos":"adj","level":"b1","mnemonic":"«ворзихтих» — «вор» (перед) + «зихт» (взгляд) — смотрит вперёд осторожно","story":"Смотрит далеко ВПЕРЁД (voor), прежде чем ступить — voorzichtig, «осторожный».","example_nl":"Wees voorzichtig op de weg.","example_ru":"Будь осторожен на дороге.","example_en":"Be careful on the road.","id":"w_voorzichtig","batch":2},{"nl":"nieuwsgierig","article":null,"en":"curious","ru":"любопытный","pos":"adj","level":"b1","mnemonic":"«ниусхирих» — «ниус» (новость) + «гирих» (жадный) — жадный до новостей","story":"Жадный до новостей (nieuws) — nieuwsgierig, «любопытный».","example_nl":"Kinderen zijn erg nieuwsgierig.","example_ru":"Дети очень любопытны.","example_en":"Children are very curious.","id":"w_nieuwsgierig","batch":2},{"nl":"verlegen","article":null,"en":"shy","ru":"застенчивый","pos":"adj","level":"b1","mnemonic":"«ферлэйхен» созвучно с «в лежку» — застенчиво лёг и молчит в уголке","story":"Застенчиво лёг (leggen) в уголке и молчит — verlegen.","example_nl":"Ze is verlegen bij vreemden.","example_ru":"Она застенчива с незнакомцами.","example_en":"She is shy around strangers.","id":"w_verlegen","batch":2},{"nl":"zelfverzekerd","article":null,"en":"confident","ru":"уверенный в себе","pos":"adj","level":"b2","mnemonic":"«зельф» (сам) + «ферзэйкерд» (застрахован) — застраховал сам себя уверенностью","story":"Сам себя «застраховал» уверенностью — zelfverzekerd.","example_nl":"Hij spreekt zelfverzekerd voor de groep.","example_ru":"Он уверенно говорит перед группой.","example_en":"He speaks confidently in front of the group.","id":"w_zelfverzekerd","batch":2},{"nl":"eerlijk","article":null,"en":"honest","ru":"честный","pos":"adj","level":"a2","mnemonic":"«эйрлэйк» созвучно с «эр» (честь) — говорит по чести","story":"Говорит по ЧЕСТИ (eer) — eerlijk, «честный».","example_nl":"Wees eerlijk tegen mij.","example_ru":"Будь со мной честен.","example_en":"Be honest with me.","id":"w_eerlijk","batch":2},{"nl":"beleefd","article":null,"en":"polite","ru":"вежливый","pos":"adj","level":"b1","mnemonic":"«бэлейфт» созвучно с «believe it» — веришь в его вежливость","story":"Настолько вежлив, что даже не верится (believe it) — beleefd.","example_nl":"De ober was erg beleefd.","example_ru":"Официант был очень вежлив.","example_en":"The waiter was very polite.","id":"w_beleefd","batch":2},{"nl":"onbeleefd","article":null,"en":"rude, impolite","ru":"невежливый","pos":"adj","level":"b1","mnemonic":"«он» (не) + beleefd (вежливый) — противоположность вежливости","story":"Отрицание beleefd — onbeleefd, «невежливый».","example_nl":"Het is onbeleefd om te schreeuwen.","example_ru":"Кричать — невежливо.","example_en":"It's rude to shout.","id":"w_onbeleefd","batch":2},{"nl":"geduldig","article":null,"en":"patient","ru":"терпеливый","pos":"adj","level":"b1","mnemonic":"«хэдюльдих» — «дульд» созвучно с «дулю» (терпит дуло) шутка про терпение","story":"Терпит-терпит, как будто «дулю» в кармане держит — geduldig, «терпеливый».","example_nl":"Ze is heel geduldig met kinderen.","example_ru":"Она очень терпелива с детьми.","example_en":"She is very patient with children.","id":"w_geduldig","batch":2},{"nl":"ongeduldig","article":null,"en":"impatient","ru":"нетерпеливый","pos":"adj","level":"b1","mnemonic":"«он» (не) + geduldig (терпеливый) — противоположность терпению","story":"Отрицание geduldig — ongeduldig, «нетерпеливый».","example_nl":"Hij werd ongeduldig in de rij.","example_ru":"Он стал нетерпеливым в очереди.","example_en":"He became impatient in the line.","id":"w_ongeduldig","batch":2},{"nl":"betrouwbaar","article":null,"en":"reliable, trustworthy","ru":"надёжный","pos":"adj","level":"b1","mnemonic":"«бэтрауббаар» — от «vertrouwen» (доверие) — тот, кому можно доверять","story":"От vertrouwen («доверие») — betrouwbaar, «надёжный».","example_nl":"Deze auto is heel betrouwbaar.","example_ru":"Эта машина очень надёжная.","example_en":"This car is very reliable.","id":"w_betrouwbaar","batch":2},{"nl":"indruk","article":"de","en":"impression","ru":"впечатление","pos":"noun","level":"b1","mnemonic":"«индрук» — «ин» (внутрь) + «друк» (давление) — впечатление давит внутрь","story":"Что-то сильно «давит» (druk) внутрь тебя — indruk, «впечатление».","example_nl":"Hij maakte een goede indruk.","example_ru":"Он произвёл хорошее впечатление.","example_en":"He made a good impression.","id":"w_indruk","batch":2},{"nl":"houding","article":"de","en":"attitude, posture","ru":"отношение, осанка","pos":"noun","level":"b1","mnemonic":"от houden (держать) — то, как себя держишь","story":"От houden («держать») — houding, «то, как ты себя держишь».","example_nl":"Zijn houding moet veranderen.","example_ru":"Его отношение должно измениться.","example_en":"His attitude needs to change.","id":"w_houding","batch":2},{"nl":"gewoonte","article":"de","en":"habit","ru":"привычка","pos":"noun","level":"b1","mnemonic":"«хэвоонте» созвучно с «говённо» — плохая привычка, говорят, «говённая»","story":"Плохую привычку в шутку называют «говённой» — gewoonte.","example_nl":"Roken is een slechte gewoonte.","example_ru":"Курение — плохая привычка.","example_en":"Smoking is a bad habit.","id":"w_gewoonte","batch":2},{"nl":"voorbeeld","article":"het","en":"example","ru":"пример","pos":"noun","level":"a2","mnemonic":"«вор» (перед) + «беелд» (образ) — образ, поставленный перед всеми","story":"Образ (beeld), поставленный ВПЕРЁД (voor) всем в пример — voorbeeld.","example_nl":"Geef me een voorbeeld.","example_ru":"Приведи мне пример.","example_en":"Give me an example.","id":"w_voorbeeld","batch":2},{"nl":"regel","article":"de","en":"rule","ru":"правило","pos":"noun","level":"a2","mnemonic":"звучит почти как «регулировать» — правило регулирует поведение","story":"Regel звучит как начало слова «регулировать» — правило, которое регулирует.","example_nl":"Dat is een belangrijke regel.","example_ru":"Это важное правило.","example_en":"That is an important rule.","id":"w_regel","batch":2},{"nl":"waarde","article":"de","en":"value","ru":"ценность","pos":"noun","level":"b1","mnemonic":"от «waarderen» (ценить) — то, что ценят","story":"От waarderen («ценить») — waarde, «ценность».","example_nl":"Deze ring heeft veel waarde.","example_ru":"Это кольцо имеет большую ценность.","example_en":"This ring has great value.","id":"w_waarde","batch":2},{"nl":"keuze","article":"de","en":"choice","ru":"выбор","pos":"noun","level":"b1","mnemonic":"«кёйзе» — от «kiezen» (выбирать)","story":"От kiezen («выбирать») — keuze, «выбор».","example_nl":"Je hebt een moeilijke keuze.","example_ru":"У тебя сложный выбор.","example_en":"You have a difficult choice.","id":"w_keuze","batch":2},{"nl":"aandacht","article":"de","en":"attention","ru":"внимание","pos":"noun","level":"b1","mnemonic":"«аандахт» — «аан» (к) + «дахт» (думал) — думал в сторону чего-то, внимание","story":"«Думал (dacht) в сторону (aan)» — aandacht, «внимание».","example_nl":"Geef me even je aandacht.","example_ru":"Удели мне немного внимания.","example_en":"Give me your attention for a moment.","id":"w_aandacht","batch":2},{"nl":"inspanning","article":"de","en":"effort","ru":"усилие","pos":"noun","level":"b1","mnemonic":"«инспаннинг» — «ин» + «спаннен» (натягивать) — натягиваешь силы внутри","story":"Натягиваешь все силы, будто пружину внутри — inspanning, «усилие».","example_nl":"Het kostte veel inspanning.","example_ru":"Это потребовало больших усилий.","example_en":"It took a lot of effort.","id":"w_inspanning","batch":2},{"nl":"overeenkomst","article":"de","en":"agreement","ru":"соглашение","pos":"noun","level":"b2","mnemonic":"«овер» (о) + «эенкомст» (совпадение) — пришли к общему согласию","story":"Пришли к одному общему мнению — overeenkomst, «соглашение».","example_nl":"We hebben een overeenkomst getekend.","example_ru":"Мы подписали соглашение.","example_en":"We signed an agreement.","id":"w_overeenkomst","batch":2},{"nl":"voorwaarde","article":"de","en":"condition","ru":"условие","pos":"noun","level":"b2","mnemonic":"«вор» (перед) + «ваарде» (ценность) — условие, поставленное заранее","story":"Условие, выставленное ЗАРАНЕЕ (voor) — voorwaarde.","example_nl":"Onder één voorwaarde help ik je.","example_ru":"При одном условии я тебе помогу.","example_en":"I'll help you on one condition.","id":"w_voorwaarde","batch":2},{"nl":"uitzondering","article":"de","en":"exception","ru":"исключение","pos":"noun","level":"b2","mnemonic":"«эйт» (из) + «зондерен» (отделять) — то, что отделили от общего правила","story":"Отделили ИЗ (uit) общего правила — uitzondering, «исключение».","example_nl":"Dit is een uitzondering op de regel.","example_ru":"Это исключение из правила.","example_en":"This is an exception to the rule.","id":"w_uitzondering","batch":2},{"nl":"oorzaak","article":"de","en":"cause","ru":"причина","pos":"noun","level":"b1","mnemonic":"«оорзаак» созвучно с «озеро» — озеро причин, из которого всё вытекает","story":"«Озеро» причин, из которого всё вытекает — oorzaak.","example_nl":"Wat is de oorzaak van het probleem?","example_ru":"В чём причина проблемы?","example_en":"What is the cause of the problem?","id":"w_oorzaak","batch":2},{"nl":"gevolg","article":"het","en":"consequence","ru":"последствие","pos":"noun","level":"b1","mnemonic":"от volgen (следовать) — то, что следует за причиной","story":"От volgen («следовать») — gevolg, «последствие».","example_nl":"Dit heeft grote gevolgen.","example_ru":"Это имеет большие последствия.","example_en":"This has big consequences.","id":"w_gevolg","batch":2},{"nl":"poging","article":"de","en":"attempt","ru":"попытка","pos":"noun","level":"b1","mnemonic":"от pogen (пытаться), созвучно с «погоня» за результатом","story":"«Погоня» за результатом — poging, «попытка».","example_nl":"Dit is mijn laatste poging.","example_ru":"Это моя последняя попытка.","example_en":"This is my last attempt.","id":"w_poging","batch":2},{"nl":"bewijs","article":"het","en":"proof, evidence","ru":"доказательство","pos":"noun","level":"b1","mnemonic":"от wijzen (указывать) — то, что указывает на истину","story":"От wijzen («указывать») — bewijs, «доказательство».","example_nl":"Heb je bewijs hiervoor?","example_ru":"У тебя есть доказательства этого?","example_en":"Do you have proof of this?","id":"w_bewijs","batch":2},{"nl":"twijfel","article":"de","en":"doubt","ru":"сомнение","pos":"noun","level":"b1","mnemonic":"«твэйфел» созвучно с «твой файл» под сомнением — не уверен, правильный ли файл","story":"Смотришь на файл и сомневаешься, тот ли это — twijfel, «сомнение».","example_nl":"Ik heb twijfel over dit plan.","example_ru":"У меня есть сомнения насчёт этого плана.","example_en":"I have doubts about this plan.","id":"w_twijfel","batch":2},{"nl":"zorg","article":"de","en":"care, worry","ru":"забота, беспокойство","pos":"noun","level":"b1","mnemonic":"«зорх» созвучно с «зоркий» взгляд заботливой мамы","story":"ЗОРКий взгляд заботливой мамы — zorg, «забота».","example_nl":"Maak je geen zorgen.","example_ru":"Не беспокойся.","example_en":"Don't worry.","id":"w_zorg","batch":2},{"nl":"druk","article":"de","en":"pressure","ru":"давление","pos":"noun","level":"b1","mnemonic":"звучит почти как «друк»(нажатие клавиши) — давление кнопки","story":"Нажимаешь на кнопку с усилием — druk, «давление».","example_nl":"Ik voel veel druk op mijn werk.","example_ru":"Я чувствую большое давление на работе.","example_en":"I feel a lot of pressure at work.","id":"w_druk","batch":2},{"nl":"tenzij","article":null,"en":"unless","ru":"если только не","pos":"conj","level":"b2","mnemonic":"«тэнзэй» — «тен» + «зэй» созвучно с «тень зияет» — кроме случая, когда тень","story":"«Кроме случая, когда...» — tenzij, «если только не».","example_nl":"We gaan wandelen, tenzij het regent.","example_ru":"Мы пойдём гулять, если только не будет дождя.","example_en":"We'll go for a walk, unless it rains.","id":"w_tenzij","batch":2},{"nl":"zodra","article":null,"en":"as soon as","ru":"как только","pos":"conj","level":"b1","mnemonic":"«зодра» — «зо» (так) + «дра» созвучно с «сразу» — так сразу, как только","story":"«Так сразу, как только» — zodra.","example_nl":"Bel me zodra je thuis bent.","example_ru":"Позвони мне, как только будешь дома.","example_en":"Call me as soon as you're home.","id":"w_zodra","batch":2},{"nl":"inmiddels","article":null,"en":"meanwhile, by now","ru":"тем временем, уже","pos":"adv","level":"b2","mnemonic":"«инмиддельс» — «ин» + «миддельс» (средний) — в середине событий, тем временем","story":"Прямо в СЕРЕДИНЕ (midden) событий — inmiddels, «тем временем».","example_nl":"Inmiddels is het al laat geworden.","example_ru":"Тем временем уже стало поздно.","example_en":"Meanwhile, it has already gotten late.","id":"w_inmiddels","batch":2},{"nl":"overigens","article":null,"en":"by the way, moreover","ru":"кстати, впрочем","pos":"adv","level":"b2","mnemonic":"«оверихенс» созвучно с «овер» (сверх) — сверх того, кстати говоря","story":"«Сверх того» ещё кое-что скажу — overigens, «кстати».","example_nl":"Overigens, heb je mijn bericht gezien?","example_ru":"Кстати, ты видел моё сообщение?","example_en":"By the way, did you see my message?","id":"w_overigens","batch":2},{"nl":"uiteindelijk","article":null,"en":"eventually, finally","ru":"в конце концов","pos":"adv","level":"b1","mnemonic":"«эйтэйндэлэйк» — «эйт» (из) + «эйнде» (конец) — в итоге, из самого конца","story":"Дошли до самого КОНЦА (einde) — uiteindelijk, «в конце концов».","example_nl":"Uiteindelijk kwamen we tot een besluit.","example_ru":"В конце концов мы пришли к решению.","example_en":"Eventually, we reached a decision.","id":"w_uiteindelijk","batch":2},{"nl":"blijkbaar","article":null,"en":"apparently","ru":"по-видимому, очевидно","pos":"adv","level":"b1","mnemonic":"от blijken (оказываться) — как оказалось","story":"От blijken («оказываться») — blijkbaar, «по-видимому».","example_nl":"Blijkbaar heeft hij het vergeten.","example_ru":"По-видимому, он это забыл.","example_en":"Apparently, he forgot it.","id":"w_blijkbaar","batch":2},{"nl":"duidelijk","article":null,"en":"clear, obvious","ru":"ясный, понятный","pos":"adj","level":"a2","mnemonic":"«дёйделэйк» созвучно с «дуй, делай» — всё ясно, дуй и делай","story":"«Дуй и делай, всё ясно!» — duidelijk, «понятный».","example_nl":"Zijn uitleg was heel duidelijk.","example_ru":"Его объяснение было очень понятным.","example_en":"His explanation was very clear.","id":"w_duidelijk","batch":2},{"nl":"gewoonlijk","article":null,"en":"usually","ru":"обычно","pos":"adv","level":"a2","mnemonic":"от gewoon (обычный) — как обычно","story":"От gewoon («обычный») — gewoonlijk, «обычно».","example_nl":"Gewoonlijk sta ik om zeven uur op.","example_ru":"Обычно я встаю в семь.","example_en":"I usually get up at seven.","id":"w_gewoonlijk","batch":2},{"nl":"voortdurend","article":null,"en":"constantly","ru":"постоянно","pos":"adv","level":"b2","mnemonic":"«ворт» + «дюрен» (длиться) — длится и продолжается без конца","story":"Всё время ДЛИТСЯ (duren) — voortdurend, «постоянно».","example_nl":"Hij klaagt voortdurend.","example_ru":"Он постоянно жалуется.","example_en":"He constantly complains.","id":"w_voortdurend","batch":2},{"nl":"nauwelijks","article":null,"en":"hardly, barely","ru":"едва, почти не","pos":"adv","level":"b1","mnemonic":"«науэлэйкс» созвучно с «на уровне» самого минимума","story":"На самом минимальном УРОВНЕ — nauwelijks, «едва».","example_nl":"Ik heb nauwelijks geslapen.","example_ru":"Я почти не спал.","example_en":"I hardly slept.","id":"w_nauwelijks","batch":2},{"nl":"opmerken","article":null,"en":"to notice","ru":"замечать","pos":"verb","level":"b1","mnemonic":"«опмэркен» — «оп» (на) + «меркен» созвучно с «маркер» — отмечаешь маркером","story":"Отмечаешь важное МАРКЕРом — opmerken, «замечать».","example_nl":"Ik merkte een fout op.","example_ru":"Я заметил ошибку.","example_en":"I noticed a mistake.","id":"w_opmerken","batch":3},{"nl":"aanbevelen","article":null,"en":"to recommend","ru":"рекомендовать","pos":"verb","level":"b1","mnemonic":"«аанбэвэйлен» — «аан» (к) + «бевелен» (приказывать) — мягко советуешь, как приказ-совет","story":"Даёшь мягкий совет, почти как приказ — aanbevelen, «рекомендовать».","example_nl":"Ik kan dit restaurant aanbevelen.","example_ru":"Я могу порекомендовать этот ресторан.","example_en":"I can recommend this restaurant.","id":"w_aanbevelen","batch":3},{"nl":"toegeven","article":null,"en":"to admit","ru":"признавать(ся)","pos":"verb","level":"b1","mnemonic":"«тухэйвен» — «ту» (к) + «хэйвен» (давать) — отдаёшь правду, признаёшься","story":"Отдаёшь (geven) правду К (toe) собеседнику — toegeven, «признаваться».","example_nl":"Hij gaf toe dat hij loog.","example_ru":"Он признался, что солгал.","example_en":"He admitted that he lied.","id":"w_toegeven","batch":3},{"nl":"benadrukken","article":null,"en":"to emphasize","ru":"подчёркивать","pos":"verb","level":"b2","mnemonic":"«бэнадрюккен» — «бе» + «на» + «дрюккен» (давить) — давишь на важную мысль","story":"Давишь (drukken) на мысль, чтобы выделить — benadrukken, «подчёркивать».","example_nl":"Ze benadrukte het belang van rust.","example_ru":"Она подчеркнула важность отдыха.","example_en":"She emphasized the importance of rest.","id":"w_benadrukken","batch":3},{"nl":"overwegen","article":null,"en":"to consider","ru":"рассматривать, обдумывать","pos":"verb","level":"b1","mnemonic":"«овервэйхен» — «овер» (над) + «вэйхен» (взвешивать) — взвешиваешь варианты","story":"Взвешиваешь (wegen) все варианты НАД (over) столом — overwegen, «обдумывать».","example_nl":"Ik overweeg om te verhuizen.","example_ru":"Я обдумываю переезд.","example_en":"I am considering moving.","id":"w_overwegen","batch":3},{"nl":"verwerken","article":null,"en":"to process","ru":"обрабатывать","pos":"verb","level":"b1","mnemonic":"от werken (работать) — прорабатываешь информацию","story":"От werken («работать») с приставкой — verwerken, «обрабатывать».","example_nl":"De computer verwerkt de gegevens.","example_ru":"Компьютер обрабатывает данные.","example_en":"The computer processes the data.","id":"w_verwerken","batch":3},{"nl":"samenwerken","article":null,"en":"to cooperate","ru":"сотрудничать","pos":"verb","level":"b1","mnemonic":"«самен» (вместе) + «веркен» (работать) — работать вместе","story":"«Работать (werken) вместе (samen)» — samenwerken, «сотрудничать».","example_nl":"We moeten beter samenwerken.","example_ru":"Нам нужно лучше сотрудничать.","example_en":"We need to cooperate better.","id":"w_samenwerken","batch":3},{"nl":"beïnvloeden","article":null,"en":"to influence","ru":"влиять","pos":"verb","level":"b2","mnemonic":"от «invloed» (влияние) — оказывать влияние","story":"От invloed («влияние») — beïnvloeden, «влиять».","example_nl":"Reclame beïnvloedt onze keuzes.","example_ru":"Реклама влияет на наш выбор.","example_en":"Advertising influences our choices.","id":"w_be_nvloeden","batch":3},{"nl":"verzekeren","article":null,"en":"to insure, to assure","ru":"страховать, заверять","pos":"verb","level":"b1","mnemonic":"«ферзэйкерен» созвучно с «резервировать» надёжность","story":"«Резервируешь» надёжность на будущее — verzekeren, «страховать».","example_nl":"Ik verzeker je dat het goed komt.","example_ru":"Я уверяю тебя, что всё будет хорошо.","example_en":"I assure you it will be fine.","id":"w_verzekeren","batch":3},{"nl":"vervangen","article":null,"en":"to replace","ru":"заменять","pos":"verb","level":"b1","mnemonic":"«фервангхен» созвучно с «в вагон» — заменил один вагон на другой","story":"Заменил старый ВАГОН на новый — vervangen, «заменять».","example_nl":"We moeten de band vervangen.","example_ru":"Нам нужно заменить шину.","example_en":"We need to replace the tire.","id":"w_vervangen","batch":3},{"nl":"aanpassen","article":null,"en":"to adjust, to adapt","ru":"приспосабливать(ся)","pos":"verb","level":"b1","mnemonic":"«аан» (к) + «пассен» (подходить) — подгоняешь под нужный размер","story":"Подгоняешь ПОД нужный размер — aanpassen, «приспосабливать».","example_nl":"Ik moet me aanpassen aan de situatie.","example_ru":"Мне нужно приспособиться к ситуации.","example_en":"I need to adapt to the situation.","id":"w_aanpassen","batch":3},{"nl":"verminderen","article":null,"en":"to reduce","ru":"уменьшать","pos":"verb","level":"b1","mnemonic":"«ферминдерен» — «вер» + «миндерен» созвучно с «минимум» — сводить к минимуму","story":"Сводишь всё к МИНИмуму — verminderen, «уменьшать».","example_nl":"We moeten de kosten verminderen.","example_ru":"Нам нужно снизить расходы.","example_en":"We need to reduce the costs.","id":"w_verminderen","batch":3},{"nl":"vergroten","article":null,"en":"to increase, to enlarge","ru":"увеличивать","pos":"verb","level":"b1","mnemonic":"от groot (большой) — делать больше","story":"От groot («большой») — vergroten, «увеличивать».","example_nl":"We willen ons bedrijf vergroten.","example_ru":"Мы хотим расширить свою компанию.","example_en":"We want to grow our company.","id":"w_vergroten","batch":3},{"nl":"garanderen","article":null,"en":"to guarantee","ru":"гарантировать","pos":"verb","level":"b1","mnemonic":"звучит почти как «гарантировать»","story":"Garanderen почти совпадает со словом «гарантировать».","example_nl":"Ik kan het succes niet garanderen.","example_ru":"Я не могу гарантировать успех.","example_en":"I can't guarantee success.","id":"w_garanderen","batch":3},{"nl":"erkennen","article":null,"en":"to recognize, to acknowledge","ru":"признавать","pos":"verb","level":"b1","mnemonic":"от kennen (знать) — признать, что знаешь и понимаешь","story":"От kennen («знать») — erkennen, «признавать».","example_nl":"Hij erkende zijn fout.","example_ru":"Он признал свою ошибку.","example_en":"He acknowledged his mistake.","id":"w_erkennen","batch":3},{"nl":"verzekering","article":"de","en":"insurance","ru":"страховка","pos":"noun","level":"b1","mnemonic":"от verzekeren (страховать) — то, что страхует","story":"От verzekeren («страховать») — verzekering, «страховка».","example_nl":"Heb je een reisverzekering?","example_ru":"У тебя есть страховка для путешествий?","example_en":"Do you have travel insurance?","id":"w_verzekering","batch":3},{"nl":"rekening","article":"de","en":"bill, account","ru":"счёт","pos":"noun","level":"a2","mnemonic":"«рэйкенинг» созвучно с «рэкет» — платишь по счёту, как рэкету","story":"Платишь по счёту, будто отдаёшь дань РЭКЕТу — rekening.","example_nl":"Mag ik de rekening, alstublieft?","example_ru":"Можно счёт, пожалуйста?","example_en":"Can I have the bill, please?","id":"w_rekening","batch":3},{"nl":"korting","article":"de","en":"discount","ru":"скидка","pos":"noun","level":"a2","mnemonic":"от kort (короткий) — цена стала короче","story":"От kort («короткий») — korting, «скидка» (цена стала короче).","example_nl":"Ik kreeg tien procent korting.","example_ru":"Я получил скидку в десять процентов.","example_en":"I got a ten percent discount.","id":"w_korting","batch":3},{"nl":"afspraak","article":"de","en":"appointment","ru":"договорённость, встреча","pos":"noun","level":"a2","mnemonic":"«афспраак» — «аф» + «спраак» (речь) — договорились на словах","story":"Договорились на словах (spreken) — afspraak, «договорённость».","example_nl":"Ik heb een afspraak bij de dokter.","example_ru":"У меня назначен приём у врача.","example_en":"I have an appointment with the doctor.","id":"w_afspraak","batch":3},{"nl":"contract","article":"het","en":"contract","ru":"договор","pos":"noun","level":"a2","mnemonic":"звучит так же, как «контракт»","story":"Contract — то же самое слово, что и «контракт».","example_nl":"We hebben het contract getekend.","example_ru":"Мы подписали договор.","example_en":"We signed the contract.","id":"w_contract","batch":3},{"nl":"vergunning","article":"de","en":"permit, license","ru":"разрешение (официальное)","pos":"noun","level":"b1","mnemonic":"от gunnen (позволять) — официально дозволенное","story":"От gunnen («позволять») — vergunning, «разрешение».","example_nl":"Je hebt een vergunning nodig.","example_ru":"Тебе нужно разрешение.","example_en":"You need a permit.","id":"w_vergunning","batch":3},{"nl":"belasting","article":"de","en":"tax","ru":"налог","pos":"noun","level":"b1","mnemonic":"от «last» (груз, бремя) — то, что тяжким грузом ложится на кошелёк","story":"Тяжкий ГРУЗ (last) на кошелёк — belasting, «налог».","example_nl":"De belasting is dit jaar hoger.","example_ru":"В этом году налог выше.","example_en":"The tax is higher this year.","id":"w_belasting","batch":3},{"nl":"inkomen","article":"het","en":"income","ru":"доход","pos":"noun","level":"b1","mnemonic":"«ин» (внутрь) + «комен» (приходить) — то, что приходит в дом","story":"То, что «приходит» (komen) В (in) дом — inkomen, «доход».","example_nl":"Zijn inkomen is dit jaar gestegen.","example_ru":"Его доход в этом году вырос.","example_en":"His income has increased this year.","id":"w_inkomen","batch":3},{"nl":"uitgave","article":"de","en":"expense","ru":"расход","pos":"noun","level":"b1","mnemonic":"«эйт» (наружу) + «хаве» (давать) — деньги уходят наружу","story":"Деньги уходят НАРУЖУ (uit) — uitgave, «расход».","example_nl":"Onze maandelijkse uitgaven zijn hoog.","example_ru":"Наши ежемесячные расходы высокие.","example_en":"Our monthly expenses are high.","id":"w_uitgave","batch":3},{"nl":"begroting","article":"de","en":"budget","ru":"бюджет","pos":"noun","level":"b2","mnemonic":"от «groot» (большой) — прикидываешь по-крупному, сколько нужно","story":"Прикидываешь всё по-крупному (groot) заранее — begroting, «бюджет».","example_nl":"De begroting is dit jaar krap.","example_ru":"Бюджет в этом году скудный.","example_en":"The budget is tight this year.","id":"w_begroting","batch":3},{"nl":"investering","article":"de","en":"investment","ru":"инвестиция","pos":"noun","level":"b1","mnemonic":"звучит почти как «инвестирование»","story":"Investering почти совпадает со словом «инвестирование».","example_nl":"Dit is een goede investering.","example_ru":"Это хорошая инвестиция.","example_en":"This is a good investment.","id":"w_investering","batch":3},{"nl":"lening","article":"de","en":"loan","ru":"заём, кредит","pos":"noun","level":"b1","mnemonic":"от «lenen» (одалживать) — то, что одолжили","story":"От lenen («одалживать») — lening, «заём».","example_nl":"We hebben een lening afgesloten.","example_ru":"Мы взяли кредит.","example_en":"We took out a loan.","id":"w_lening","batch":3},{"nl":"schuld","article":"de","en":"debt, guilt","ru":"долг, вина","pos":"noun","level":"b1","mnemonic":"«схюльд» созвучно с «скула» — сидит понурив скулы от долгов","story":"Сидит, понурив СКУЛы, придавленный долгами — schuld.","example_nl":"Hij heeft veel schuld.","example_ru":"У него много долгов.","example_en":"He has a lot of debt.","id":"w_schuld","batch":3},{"nl":"eigenaar","article":"de","en":"owner","ru":"владелец","pos":"noun","level":"b1","mnemonic":"от «eigen» (собственный) — тот, чьё это собственное","story":"От eigen («собственный») — eigenaar, «владелец».","example_nl":"Wie is de eigenaar van dit huis?","example_ru":"Кто владелец этого дома?","example_en":"Who is the owner of this house?","id":"w_eigenaar","batch":3},{"nl":"huurder","article":"de","en":"tenant","ru":"арендатор","pos":"noun","level":"b2","mnemonic":"от «huren» (арендовать) — тот, кто арендует","story":"От huren («арендовать») — huurder, «арендатор».","example_nl":"De huurder betaalt elke maand.","example_ru":"Арендатор платит каждый месяц.","example_en":"The tenant pays every month.","id":"w_huurder","batch":3},{"nl":"sollicitatie","article":"de","en":"job application","ru":"заявление на работу","pos":"noun","level":"b1","mnemonic":"звучит почти как «солиситор» (юрист по найму)","story":"Sollicitatie созвучно с английским solicit — «добиваться работы».","example_nl":"Ik stuurde mijn sollicitatie op.","example_ru":"Я отправил своё заявление на работу.","example_en":"I sent in my job application.","id":"w_sollicitatie","batch":3},{"nl":"vacature","article":"de","en":"job opening","ru":"вакансия","pos":"noun","level":"b1","mnemonic":"звучит почти как «вакансия»","story":"Vacature созвучно со словом «вакансия».","example_nl":"Er is een vacature bij ons bedrijf.","example_ru":"В нашей компании есть вакансия.","example_en":"There is a job opening at our company.","id":"w_vacature","batch":3},{"nl":"salaris","article":"het","en":"salary","ru":"зарплата","pos":"noun","level":"a2","mnemonic":"звучит почти как «зарплата» — почти интернациональное слово","story":"Salaris — почти интернациональное слово, как «зарплата».","example_nl":"Mijn salaris wordt maandelijks betaald.","example_ru":"Моя зарплата выплачивается ежемесячно.","example_en":"My salary is paid monthly.","id":"w_salaris","batch":3},{"nl":"promotie","article":"de","en":"promotion","ru":"повышение","pos":"noun","level":"b1","mnemonic":"звучит почти как «промоушен»","story":"Promotie почти совпадает со словом «промоушен».","example_nl":"Ze kreeg een promotie op haar werk.","example_ru":"Она получила повышение на работе.","example_en":"She got a promotion at work.","id":"w_promotie","batch":3},{"nl":"flexibel","article":null,"en":"flexible","ru":"гибкий","pos":"adj","level":"b1","mnemonic":"звучит почти как «флексибельный/гибкий»","story":"Flexibel созвучно с русским «флексибельный».","example_nl":"Mijn werktijden zijn flexibel.","example_ru":"У меня гибкий рабочий график.","example_en":"My working hours are flexible.","id":"w_flexibel","batch":3},{"nl":"stressvol","article":null,"en":"stressful","ru":"напряжённый (о стрессе)","pos":"adj","level":"b1","mnemonic":"«стресс» + «вол» (полный) — полный стресса","story":"«Полный (vol) стресса» — stressvol.","example_nl":"Deze week was erg stressvol.","example_ru":"Эта неделя была очень напряжённой.","example_en":"This week was very stressful.","id":"w_stressvol","batch":3},{"nl":"efficiënt","article":null,"en":"efficient","ru":"эффективный","pos":"adj","level":"b1","mnemonic":"звучит почти как «эффективный»","story":"Efficiënt почти совпадает со словом «эффективный».","example_nl":"Dit systeem is heel efficiënt.","example_ru":"Эта система очень эффективна.","example_en":"This system is very efficient.","id":"w_effici_nt","batch":3},{"nl":"overtuigend","article":null,"en":"convincing","ru":"убедительный","pos":"adj","level":"b2","mnemonic":"от «overtuigen» (убеждать) — то, что убеждает","story":"От overtuigen («убеждать») — overtuigend, «убедительный».","example_nl":"Zijn argument was overtuigend.","example_ru":"Его аргумент был убедительным.","example_en":"His argument was convincing.","id":"w_overtuigend","batch":3},{"nl":"redelijk","article":null,"en":"reasonable","ru":"разумный","pos":"adj","level":"b1","mnemonic":"от «rede» (разум, довод) — соответствующий разуму","story":"От rede («разум») — redelijk, «разумный».","example_nl":"Dat is een redelijke prijs.","example_ru":"Это разумная цена.","example_en":"That is a reasonable price.","id":"w_redelijk","batch":3},{"nl":"onredelijk","article":null,"en":"unreasonable","ru":"неразумный","pos":"adj","level":"b1","mnemonic":"«он» (не) + redelijk (разумный)","story":"Отрицание redelijk — onredelijk, «неразумный».","example_nl":"Zijn eis was onredelijk.","example_ru":"Его требование было неразумным.","example_en":"His demand was unreasonable.","id":"w_onredelijk","batch":3},{"nl":"geschikt","article":null,"en":"suitable","ru":"подходящий","pos":"adj","level":"b1","mnemonic":"«хэсхикт» созвучно с «гладко schicked» — гладко подходит, как влитое","story":"Подходит гладко, как влитое — geschikt.","example_nl":"Dit is niet geschikt voor kinderen.","example_ru":"Это не подходит для детей.","example_en":"This is not suitable for children.","id":"w_geschikt","batch":3},{"nl":"ongeschikt","article":null,"en":"unsuitable","ru":"неподходящий","pos":"adj","level":"b1","mnemonic":"«он» (не) + geschikt (подходящий)","story":"Отрицание geschikt — ongeschikt, «неподходящий».","example_nl":"Dit water is ongeschikt om te drinken.","example_ru":"Эта вода непригодна для питья.","example_en":"This water is unsuitable for drinking.","id":"w_ongeschikt","batch":3},{"nl":"aanzienlijk","article":null,"en":"considerable, significant","ru":"значительный","pos":"adj","level":"b2","mnemonic":"«аанзиенлэйк» — «аан» + «зиен» (видеть) — заметно на вид, значительно","story":"Настолько большое, что сразу ВИДНО (zien) — aanzienlijk, «значительный».","example_nl":"De prijzen zijn aanzienlijk gestegen.","example_ru":"Цены значительно выросли.","example_en":"Prices have risen considerably.","id":"w_aanzienlijk","batch":3},{"nl":"typisch","article":null,"en":"typical","ru":"типичный","pos":"adj","level":"a2","mnemonic":"звучит почти как «типичный»","story":"Typisch почти совпадает со словом «типичный».","example_nl":"Dat is typisch voor hem.","example_ru":"Это для него типично.","example_en":"That is typical of him.","id":"w_typisch","batch":3},{"nl":"daardoor","article":null,"en":"as a result, because of that","ru":"из-за этого, вследствие","pos":"adv","level":"b1","mnemonic":"«даардоор» — «даар» (там) + «доор» (через) — через то самое","story":"«Через то самое (daar)» — daardoor, «вследствие этого».","example_nl":"Het regende, daardoor bleven we thuis.","example_ru":"Шёл дождь, из-за этого мы остались дома.","example_en":"It rained, as a result we stayed home.","id":"w_daardoor","batch":3},{"nl":"desondanks","article":null,"en":"nevertheless, despite that","ru":"тем не менее","pos":"adv","level":"b2","mnemonic":"от ondanks (несмотря на) — несмотря на всё это","story":"От ondanks («несмотря на») — desondanks, «тем не менее».","example_nl":"Het was duur, desondanks kocht ze het.","example_ru":"Это было дорого, тем не менее она это купила.","example_en":"It was expensive, nevertheless she bought it.","id":"w_desondanks","batch":3},{"nl":"kortom","article":null,"en":"in short","ru":"короче говоря","pos":"adv","level":"b1","mnemonic":"от kort (короткий) — коротко говоря","story":"От kort («короткий») — kortom, «короче говоря».","example_nl":"Kortom, het plan is mislukt.","example_ru":"Короче говоря, план провалился.","example_en":"In short, the plan failed.","id":"w_kortom","batch":3},{"nl":"overeenkomstig","article":null,"en":"according to, in accordance with","ru":"в соответствии с","pos":"prep","level":"b2","mnemonic":"от overeenkomst (соглашение) — согласно договорённости","story":"От overeenkomst («соглашение») — overeenkomstig, «в соответствии с».","example_nl":"Overeenkomstig de regels mag dit niet.","example_ru":"В соответствии с правилами это запрещено.","example_en":"In accordance with the rules, this is not allowed.","id":"w_overeenkomstig","batch":3},{"nl":"voor zover","article":null,"en":"as far as","ru":"насколько","pos":"adv","level":"b2","mnemonic":"«вор» (перед) + «зовер» (так далеко) — насколько простирается взгляд","story":"«Так далеко, как видно (ver)» — voor zover, «насколько».","example_nl":"Voor zover ik weet, komt hij morgen.","example_ru":"Насколько я знаю, он приедет завтра.","example_en":"As far as I know, he's coming tomorrow.","id":"w_voor_zover","batch":3},{"nl":"vergadering","article":"de","en":"meeting","ru":"совещание","pos":"noun","level":"a2","mnemonic":"от «vergaderen» (собираться) — все собрались вместе","story":"Все СОБРАЛИСЬ (vergaderen) в одном зале — vergadering, «совещание».","example_nl":"De vergadering begint om tien uur.","example_ru":"Совещание начинается в десять.","example_en":"The meeting starts at ten.","id":"w_vergadering","batch":4},{"nl":"agenda","article":"de","en":"agenda","ru":"повестка дня","pos":"noun","level":"a2","mnemonic":"звучит так же, как «агенда/повестка»","story":"Agenda — то же самое международное слово.","example_nl":"Wat staat er op de agenda?","example_ru":"Что стоит в повестке дня?","example_en":"What's on the agenda?","id":"w_agenda","batch":4},{"nl":"presentatie","article":"de","en":"presentation","ru":"презентация","pos":"noun","level":"a2","mnemonic":"звучит так же, как «презентация»","story":"Presentatie — то же самое слово, что и «презентация».","example_nl":"Ik geef morgen een presentatie.","example_ru":"Завтра я делаю презентацию.","example_en":"I'm giving a presentation tomorrow.","id":"w_presentatie","batch":4},{"nl":"rapport","article":"het","en":"report","ru":"отчёт","pos":"noun","level":"a2","mnemonic":"звучит так же, как «рапорт»","story":"Rapport — то же самое слово, что и военный «рапорт».","example_nl":"Stuur me het rapport voor vrijdag.","example_ru":"Пришли мне отчёт до пятницы.","example_en":"Send me the report by Friday.","id":"w_rapport","batch":4},{"nl":"deadline","article":"de","en":"deadline","ru":"крайний срок","pos":"noun","level":"b1","mnemonic":"звучит так же, как английское deadline","story":"Deadline — то же самое международное слово.","example_nl":"De deadline is volgende week.","example_ru":"Крайний срок — на следующей неделе.","example_en":"The deadline is next week.","id":"w_deadline","batch":4},{"nl":"team","article":"het","en":"team","ru":"команда","pos":"noun","level":"a2","mnemonic":"звучит так же, как «тим/команда»","story":"Team — то же самое международное слово.","example_nl":"Ons team werkt hard.","example_ru":"Наша команда усердно работает.","example_en":"Our team works hard.","id":"w_team","batch":4},{"nl":"afdeling","article":"de","en":"department","ru":"отдел","pos":"noun","level":"b1","mnemonic":"от «delen» (делить) — часть, на которую поделили компанию","story":"Компанию ПОДЕЛИЛИ (delen) на части — afdeling, «отдел».","example_nl":"Ik werk op de verkoopafdeling.","example_ru":"Я работаю в отделе продаж.","example_en":"I work in the sales department.","id":"w_afdeling","batch":4},{"nl":"manager","article":"de","en":"manager","ru":"менеджер","pos":"noun","level":"a2","mnemonic":"звучит так же, как «менеджер»","story":"Manager — то же самое международное слово.","example_nl":"Mijn manager is erg streng.","example_ru":"Мой менеджер очень строгий.","example_en":"My manager is very strict.","id":"w_manager","batch":4},{"nl":"strategie","article":"de","en":"strategy","ru":"стратегия","pos":"noun","level":"b1","mnemonic":"звучит так же, как «стратегия»","story":"Strategie — то же самое слово, что и «стратегия».","example_nl":"We hebben een nieuwe strategie nodig.","example_ru":"Нам нужна новая стратегия.","example_en":"We need a new strategy.","id":"w_strategie","batch":4},{"nl":"doelstelling","article":"de","en":"objective, goal","ru":"цель (задача)","pos":"noun","level":"b1","mnemonic":"«доел» (цель) + «стеллинг» (постановка) — цель, которую поставили","story":"Цель (doel), которую официально ПОСТАВИЛИ (stellen) — doelstelling.","example_nl":"Onze doelstelling is duidelijk.","example_ru":"Наша цель ясна.","example_en":"Our objective is clear.","id":"w_doelstelling","batch":4},{"nl":"prestatie","article":"de","en":"performance","ru":"результат работы, достижение","pos":"noun","level":"b1","mnemonic":"звучит почти как «престиж» через результаты","story":"Хорошие результаты приносят ПРЕСТИЖ — prestatie.","example_nl":"Zijn prestaties zijn indrukwekkend.","example_ru":"Его результаты впечатляют.","example_en":"His performance is impressive.","id":"w_prestatie","batch":4},{"nl":"efficiëntie","article":"de","en":"efficiency","ru":"эффективность","pos":"noun","level":"b1","mnemonic":"от efficiënt (эффективный) — свойство быть эффективным","story":"От efficiënt («эффективный») — efficiëntie, «эффективность».","example_nl":"We willen de efficiëntie verbeteren.","example_ru":"Мы хотим повысить эффективность.","example_en":"We want to improve efficiency.","id":"w_effici_ntie","batch":4},{"nl":"samenwerking","article":"de","en":"cooperation","ru":"сотрудничество","pos":"noun","level":"b1","mnemonic":"от samenwerken (сотрудничать) — само сотрудничество как явление","story":"От samenwerken («сотрудничать») — samenwerking, «сотрудничество».","example_nl":"Goede samenwerking is belangrijk.","example_ru":"Хорошее сотрудничество важно.","example_en":"Good cooperation is important.","id":"w_samenwerking","batch":4},{"nl":"collega's","article":null,"en":"colleagues","ru":"коллеги","pos":"noun","level":"a2","mnemonic":"множественное число от collega","story":"Форма множественного числа от collega — «коллеги».","example_nl":"Mijn collega's zijn erg aardig.","example_ru":"Мои коллеги очень приятные.","example_en":"My colleagues are very nice.","id":"w_collega_s","batch":4},{"nl":"kantine","article":"de","en":"canteen","ru":"столовая (на работе)","pos":"noun","level":"a2","mnemonic":"звучит почти как «кантина»","story":"Kantine созвучно с русским «кантина/столовая».","example_nl":"We lunchen in de kantine.","example_ru":"Мы обедаем в столовой.","example_en":"We have lunch in the canteen.","id":"w_kantine","batch":4},{"nl":"omzet","article":"de","en":"turnover, revenue","ru":"оборот, выручка","pos":"noun","level":"b1","mnemonic":"«омзет» — «ом» (вокруг) + «зет» (ставить) — деньги, что оборачиваются вокруг бизнеса","story":"Деньги оборачиваются ВОКРУГ (om) бизнеса — omzet, «выручка».","example_nl":"De omzet is dit kwartaal gestegen.","example_ru":"Выручка в этом квартале выросла.","example_en":"Revenue has increased this quarter.","id":"w_omzet","batch":4},{"nl":"marge","article":"de","en":"margin","ru":"маржа","pos":"noun","level":"b1","mnemonic":"звучит так же, как «маржа»","story":"Marge — то же самое финансовое слово.","example_nl":"De marge op dit product is laag.","example_ru":"Маржа на этот продукт низкая.","example_en":"The margin on this product is low.","id":"w_marge","batch":4},{"nl":"voorraad","article":"de","en":"stock, inventory","ru":"запас, склад","pos":"noun","level":"b1","mnemonic":"«вор» (перед) + «раад» (совет/запас) — запасено заранее","story":"Запасено ЗАРАНЕЕ (voor) на будущее — voorraad, «запас».","example_nl":"De voorraad is bijna op.","example_ru":"Запасы почти закончились.","example_en":"The stock is almost out.","id":"w_voorraad","batch":4},{"nl":"levering","article":"de","en":"delivery","ru":"поставка","pos":"noun","level":"b1","mnemonic":"от leveren (поставлять) — сам процесс поставки","story":"От leveren («поставлять») — levering, «поставка».","example_nl":"De levering komt volgende week.","example_ru":"Поставка придёт на следующей неделе.","example_en":"The delivery arrives next week.","id":"w_levering","batch":4},{"nl":"leverancier","article":"de","en":"supplier","ru":"поставщик","pos":"noun","level":"b1","mnemonic":"от leveren (поставлять) — тот, кто поставляет","story":"От leveren («поставлять») — leverancier, «поставщик».","example_nl":"Onze leverancier is heel betrouwbaar.","example_ru":"Наш поставщик очень надёжный.","example_en":"Our supplier is very reliable.","id":"w_leverancier","batch":4},{"nl":"distributeur","article":"de","en":"distributor","ru":"дистрибьютор","pos":"noun","level":"b1","mnemonic":"звучит так же, как «дистрибьютор»","story":"Distributeur — то же самое слово, что и «дистрибьютор».","example_nl":"Wij zijn de officiële distributeur.","example_ru":"Мы официальный дистрибьютор.","example_en":"We are the official distributor.","id":"w_distributeur","batch":4},{"nl":"klant","article":"de","en":"customer, client","ru":"клиент","pos":"noun","level":"a2","mnemonic":"«клант» созвучно с «клиент» напрямую","story":"Klant звучит почти как «клиент».","example_nl":"De klant heeft altijd gelijk.","example_ru":"Клиент всегда прав.","example_en":"The customer is always right.","id":"w_klant","batch":4},{"nl":"exporteren","article":null,"en":"to export","ru":"экспортировать","pos":"verb","level":"b1","mnemonic":"звучит так же, как «экспортировать»","story":"Exporteren — то же самое слово, что и «экспортировать».","example_nl":"We exporteren groenten naar Duitsland.","example_ru":"Мы экспортируем овощи в Германию.","example_en":"We export vegetables to Germany.","id":"w_exporteren","batch":4},{"nl":"importeren","article":null,"en":"to import","ru":"импортировать","pos":"verb","level":"b1","mnemonic":"звучит так же, как «импортировать»","story":"Importeren — то же самое слово, что и «импортировать».","example_nl":"Dit bedrijf importeert fruit.","example_ru":"Эта компания импортирует фрукты.","example_en":"This company imports fruit.","id":"w_importeren","batch":4},{"nl":"prijsstelling","article":"de","en":"pricing","ru":"ценообразование","pos":"noun","level":"b2","mnemonic":"«прэйс» (цена) + «стеллинг» (постановка) — установление цены","story":"«Постановка (stellen) цены (prijs)» — prijsstelling, «ценообразование».","example_nl":"De prijsstelling is nog niet klaar.","example_ru":"Ценообразование ещё не готово.","example_en":"The pricing is not ready yet.","id":"w_prijsstelling","batch":4},{"nl":"zaad","article":"het","en":"seed","ru":"семя, семена","pos":"noun","level":"a2","mnemonic":"«заат» созвучно с «заря» — семена сеют на заре","story":"Семена сеют ранним утром, на самой ЗАРЕ — zaad, «семя».","example_nl":"We planten het zaad in het voorjaar.","example_ru":"Мы сажаем семена весной.","example_en":"We plant the seed in spring.","id":"w_zaad","batch":4},{"nl":"zaaien","article":null,"en":"to sow","ru":"сеять","pos":"verb","level":"a2","mnemonic":"от zaad (семя) — то, что делают с семенами","story":"От zaad («семя») — zaaien, «сеять».","example_nl":"De boer zaait elk jaar in april.","example_ru":"Фермер сеет каждый год в апреле.","example_en":"The farmer sows every year in April.","id":"w_zaaien","batch":4},{"nl":"oogst","article":"de","en":"harvest","ru":"урожай","pos":"noun","level":"a2","mnemonic":"«ооахст» созвучно с «охать» от богатого урожая","story":"Все ОХают от такого богатого урожая — oogst.","example_nl":"De oogst was dit jaar goed.","example_ru":"Урожай в этом году был хорошим.","example_en":"The harvest was good this year.","id":"w_oogst","batch":4},{"nl":"oogsten","article":null,"en":"to harvest","ru":"собирать урожай","pos":"verb","level":"a2","mnemonic":"от oogst (урожай) — то, что делают с урожаем","story":"От oogst («урожай») — oogsten, «собирать урожай».","example_nl":"In september oogsten we aardappels.","example_ru":"В сентябре мы собираем урожай картофеля.","example_en":"In September we harvest potatoes.","id":"w_oogsten","batch":4},{"nl":"gewas","article":"het","en":"crop","ru":"культура (сельхоз.)","pos":"noun","level":"b1","mnemonic":"от «wassen» (расти, устар.) — то, что выросло на поле","story":"То, что выросло (groeien) на поле — gewas, «культура/посев».","example_nl":"Tarwe is een belangrijk gewas.","example_ru":"Пшеница — важная культура.","example_en":"Wheat is an important crop.","id":"w_gewas","batch":4},{"nl":"akker","article":"de","en":"field (arable)","ru":"пашня, поле","pos":"noun","level":"b1","mnemonic":"«аккер» созвучно с «акр» — единица земли поля","story":"Поле измеряют в АКРах — akker, «пашня».","example_nl":"De akker ligt achter de boerderij.","example_ru":"Поле находится за фермой.","example_en":"The field is behind the farm.","id":"w_akker","batch":4},{"nl":"boerderij","article":"de","en":"farm","ru":"ферма","pos":"noun","level":"a2","mnemonic":"от «boer» (фермер) — место, где живёт фермер","story":"От boer («фермер») — boerderij, «ферма».","example_nl":"Ze wonen op een grote boerderij.","example_ru":"Они живут на большой ферме.","example_en":"They live on a big farm.","id":"w_boerderij","batch":4},{"nl":"landbouw","article":"de","en":"agriculture","ru":"сельское хозяйство","pos":"noun","level":"a2","mnemonic":"«ланд» (земля) + «бау» (строить/возделывать) — возделывание земли","story":"«Возделывание (bouwen) земли (land)» — landbouw, «сельское хозяйство».","example_nl":"Landbouw is belangrijk voor Nederland.","example_ru":"Сельское хозяйство важно для Нидерландов.","example_en":"Agriculture is important for the Netherlands.","id":"w_landbouw","batch":4},{"nl":"teelt","article":"de","en":"cultivation","ru":"выращивание, культура","pos":"noun","level":"b1","mnemonic":"от telen (выращивать) — сам процесс выращивания","story":"От telen («выращивать») — teelt, «выращивание».","example_nl":"De teelt van tomaten kost veel water.","example_ru":"Выращивание томатов требует много воды.","example_en":"Growing tomatoes requires a lot of water.","id":"w_teelt","batch":4},{"nl":"telen","article":null,"en":"to grow, to cultivate","ru":"выращивать (растения)","pos":"verb","level":"b1","mnemonic":"«тэйлен» созвучно с «телиться» — выращивать урожай, как ждать приплод","story":"Заботливо растишь урожай, как ждёшь приплод — telen.","example_nl":"Deze boer teelt biologische groenten.","example_ru":"Этот фермер выращивает органические овощи.","example_en":"This farmer grows organic vegetables.","id":"w_telen","batch":4},{"nl":"kas","article":"de","en":"greenhouse","ru":"теплица","pos":"noun","level":"a2","mnemonic":"«кас» созвучно со словом «каска» — теплица как защитный купол над растениями","story":"Теплица — как «каска», защитный купол над растениями — kas.","example_nl":"De tomaten groeien in een kas.","example_ru":"Помидоры растут в теплице.","example_en":"The tomatoes grow in a greenhouse.","id":"w_kas","batch":4},{"nl":"mest","article":"de","en":"manure, fertilizer","ru":"удобрение","pos":"noun","level":"b1","mnemonic":"«мэст» созвучно с «место» — удобряют определённое место земли","story":"Удобряют определённое МЕСТО земли — mest, «удобрение».","example_nl":"De boer strooit mest over het veld.","example_ru":"Фермер разбрасывает удобрение по полю.","example_en":"The farmer spreads fertilizer over the field.","id":"w_mest","batch":4},{"nl":"bemesting","article":"de","en":"fertilization","ru":"внесение удобрений","pos":"noun","level":"b1","mnemonic":"от mest (удобрение) — процесс внесения удобрений","story":"От mest («удобрение») — bemesting, «внесение удобрений».","example_nl":"Bemesting gebeurt twee keer per jaar.","example_ru":"Внесение удобрений происходит два раза в год.","example_en":"Fertilization happens twice a year.","id":"w_bemesting","batch":4},{"nl":"irrigatie","article":"de","en":"irrigation","ru":"орошение","pos":"noun","level":"b1","mnemonic":"звучит так же, как «ирригация»","story":"Irrigatie — то же самое слово, что и «ирригация».","example_nl":"Irrigatie is nodig in droge gebieden.","example_ru":"Орошение нужно в засушливых районах.","example_en":"Irrigation is needed in dry areas.","id":"w_irrigatie","batch":4},{"nl":"opbrengst","article":"de","en":"yield","ru":"урожайность, выход продукции","pos":"noun","level":"b1","mnemonic":"«оп» (вверх) + «брэнген» (приносить) — то, что земля приносит наверх","story":"То, что земля «приносит» (brengen) наверх (op) — opbrengst, «урожайность».","example_nl":"De opbrengst per hectare is hoog.","example_ru":"Урожайность на гектар высокая.","example_en":"The yield per hectare is high.","id":"w_opbrengst","batch":4},{"nl":"kwekerij","article":"de","en":"nursery (plants)","ru":"питомник (растений)","pos":"noun","level":"b1","mnemonic":"от kweken (выращивать/разводить) — место, где разводят растения","story":"От kweken («разводить») — kwekerij, «питомник».","example_nl":"We kopen zaailingen bij de kwekerij.","example_ru":"Мы покупаем рассаду в питомнике.","example_en":"We buy seedlings at the nursery.","id":"w_kwekerij","batch":4},{"nl":"kweken","article":null,"en":"to cultivate, to breed","ru":"разводить, выращивать","pos":"verb","level":"b1","mnemonic":"«квэйкен» созвучно с «квакать» — лягушки квакают у пруда, где всё разводят","story":"Лягушки квакают у пруда, где всё бережно разводят — kweken.","example_nl":"Ze kweken speciale rassen tomaten.","example_ru":"Они выращивают особые сорта томатов.","example_en":"They cultivate special varieties of tomatoes.","id":"w_kweken","batch":4},{"nl":"ras","article":"het","en":"variety, breed","ru":"сорт, порода","pos":"noun","level":"b1","mnemonic":"«рас» звучит почти так же, как «раса/сорт»","story":"Ras созвучно с русским «раса» — определённый сорт или вид.","example_nl":"Dit is een nieuw ras komkommer.","example_ru":"Это новый сорт огурца.","example_en":"This is a new variety of cucumber.","id":"w_ras","batch":4},{"nl":"kiemen","article":null,"en":"to germinate","ru":"прорастать","pos":"verb","level":"b1","mnemonic":"«киемен» созвучно с «кинуть» росток наружу","story":"Семя «кидает» первый росток наружу — kiemen, «прорастать».","example_nl":"De zaden beginnen te kiemen.","example_ru":"Семена начинают прорастать.","example_en":"The seeds start to germinate.","id":"w_kiemen","batch":4},{"nl":"zaailing","article":"de","en":"seedling","ru":"рассада, саженец","pos":"noun","level":"b1","mnemonic":"от zaad (семя) — молодое растение из семени","story":"От zaad («семя») — zaailing, «рассада».","example_nl":"De zaailingen staan in de kas.","example_ru":"Рассада стоит в теплице.","example_en":"The seedlings are in the greenhouse.","id":"w_zaailing","batch":4},{"nl":"onkruid","article":"het","en":"weed","ru":"сорняк","pos":"noun","level":"a2","mnemonic":"«он» (не) + kruid (трава/зелень) — «не-трава», нежеланное растение","story":"«Не-трава» (kruid), нежеланная гостья на грядке — onkruid, «сорняк».","example_nl":"Ik moet het onkruid wieden.","example_ru":"Мне нужно прополоть сорняки.","example_en":"I need to weed out the weeds.","id":"w_onkruid","batch":4},{"nl":"bodem","article":"de","en":"soil","ru":"почва","pos":"noun","level":"b1","mnemonic":"«бодем» созвучно с «под ним» — то, что под всем растёт","story":"То, что под (onder) всем — bodem, «почва».","example_nl":"De bodem hier is erg vruchtbaar.","example_ru":"Почва здесь очень плодородная.","example_en":"The soil here is very fertile.","id":"w_bodem","batch":4},{"nl":"vruchtbaar","article":null,"en":"fertile","ru":"плодородный","pos":"adj","level":"b1","mnemonic":"от vrucht (плод) — способный давать плоды","story":"От vrucht («плод») — vruchtbaar, «плодородный».","example_nl":"Deze grond is heel vruchtbaar.","example_ru":"Эта земля очень плодородная.","example_en":"This land is very fertile.","id":"w_vruchtbaar","batch":4},{"nl":"duurzaam","article":null,"en":"sustainable","ru":"устойчивый (экологически)","pos":"adj","level":"b1","mnemonic":"от duren (длиться) — то, что длится долго, не истощая природу","story":"От duren («длиться») — duurzaam, «устойчивый, долговечный».","example_nl":"We werken aan duurzame landbouw.","example_ru":"Мы работаем над устойчивым сельским хозяйством.","example_en":"We are working on sustainable agriculture.","id":"w_duurzaam","batch":4},{"nl":"biologisch","article":null,"en":"organic","ru":"органический","pos":"adj","level":"a2","mnemonic":"звучит так же, как «биологический»","story":"Biologisch — то же самое слово, что и «биологический».","example_nl":"Wij verkopen alleen biologische groenten.","example_ru":"Мы продаём только органические овощи.","example_en":"We only sell organic vegetables.","id":"w_biologisch","batch":4},{"nl":"gewasbescherming","article":"de","en":"crop protection","ru":"защита растений","pos":"noun","level":"b2","mnemonic":"«геваc» (культура) + «бесхерминг» (защита) — защита урожая","story":"«Защита (bescherming) урожая (gewas)» — gewasbescherming.","example_nl":"Gewasbescherming voorkomt ziektes.","example_ru":"Защита растений предотвращает болезни.","example_en":"Crop protection prevents diseases.","id":"w_gewasbescherming","batch":4},{"nl":"plant","article":"de","en":"plant","ru":"растение","pos":"noun","level":"a2","mnemonic":"звучит так же, как «плант/растение»","story":"Plant — то же самое международное слово.","example_nl":"Deze plant heeft veel zon nodig.","example_ru":"Этому растению нужно много солнца.","example_en":"This plant needs a lot of sun.","id":"w_plant","batch":4},{"nl":"planten","article":null,"en":"to plant","ru":"сажать (растения)","pos":"verb","level":"a2","mnemonic":"от plant (растение) — сажать растение в землю","story":"От plant («растение») — planten, «сажать».","example_nl":"We planten morgen nieuwe bomen.","example_ru":"Завтра мы сажаем новые деревья.","example_en":"Tomorrow we plant new trees.","id":"w_planten","batch":4}];
+/* each: {id, nl, article, en, ru, pos, level, mnemonic, story, example_nl, example_ru, example_en, batch} */
+const BUILTIN_BY_ID = {};
+DUTCH_WORDS.forEach(w=>{ BUILTIN_BY_ID[w.id] = w; });
+const MAX_BATCH = DUTCH_WORDS.reduce((m,w)=>Math.max(m, w.batch||1), 1);
+
+/* ================= I18N ================= */
+const STRINGS = {
+  ru: {
+    subtitle: 'Nederlands · A2-B1-B2 · офлайн',
+    statRep: 'повторить', statNew: 'новых', statLearned: 'выучено',
+    tabStudy: 'Учить', tabWords: 'Слова', tabAdd: 'Добавить', tabAnchor: 'Тест', tabDehet: 'de·het', tabSettings: 'Ещё',
+    cardOf: (i,n)=>`Карточка ${i} из ${n}`, statusNew:'новое', statusRep:'повтор',
+    tapHint: 'нажмите на карточку, чтобы увидеть перевод',
+    quickKnow: '✓ Уже знаю — дальше',
+    gAgain:'Забыл', gAgainSub:'ещё раз', gGood:'Almost', gGoodSub:'почти', gEasy:'Know', gEasySub:'знаю точно',
+    mnemoLabel:'Созвучие', storyLabel:'Мини-история',
+    anchorTestQuestion:'Какая история про это слово верна?',
+    anchorCorrect:'Верно!', anchorWrong:'Неверно. Правильный вариант —',
+    anchorDone:'Раунд теста завершён', anchorEmpty:'Пока нет изучаемых слов для теста. Сначала пройдите пару карточек в «Учить».',
+    masteredToast:'🏆 Слово освоено — теперь будет попадаться намного реже',
+    batchAvailable:(n)=>`Доступна новая порция: +${n} слов`, loadBatchBtn:'⬇️ Загрузить следующую порцию',
+    batchLoadedToast:(n)=>`Добавлено ${n} новых слов!`, noMoreBatches:'Все доступные порции уже загружены. Попросите новую партию в чате!',
+    allDone:'На сегодня всё!', allDoneDesc:'Новые карточки появятся завтра, либо загляните в раздел «Слова», чтобы добавить ещё.',
+    replayBtn:'🔁 Повторить сегодняшние ещё раз', replayHint:'слов пройдено сегодня',
+    searchPh:'Поиск слова или перевода...', chipAll:'Все', chipNew:'Новые', chipLearning:'Учу', chipReview:'Повтор',
+    notFound:'Ничего не найдено',
+    back:'← Назад', delete:'🗑', translRu:'Перевод (русский)', mnemoField:'Созвучие', storyField:'Мини-история', exampleField:'Пример употребления',
+    regen:'🔄 Сгенерировать через ИИ (нужен интернет)', save:'Сохранить', savedToast:'Сохранено', regenToast:'Генерирую через ИИ…', regenOfflineToast:'Нет соединения — впишите вручную', deletedToast:'Удалено', deleteConfirm:'Удалить это слово?',
+    addTitle:'Добавить слово', fieldNl:'Голландское слово', fieldArticle:'Артикль', fieldRuTr:'Перевод (русский)',
+    fieldEnTr:'Перевод (английский, необязательно)', fieldPos:'Часть речи', posNoun:'существительное', posVerb:'глагол',
+    posAdj:'прилагательное', posAdv:'наречие', posConj:'союз / связка', posOther:'другое',
+    fieldMnemo:'Созвучие (необязательно)', fieldStory:'Мини-история (необязательно)', fieldExample:'Пример предложения (необязательно)',
+    addBtn:'Добавить слово', aiAssistBtn:'✨ Заполнить через ИИ (нужен интернет)', enterWordToast:'Введите слово на голландском', addedToast:'Слово добавлено',
+    dehetTitle:'Угадай артикль', dehetDone:'Раунд завершён', dehetRight:'Правильно', dehetWrong:'Ошибок', dehetRestart:'Начать заново', dehetEmpty:'Пока нет слов с известным артиклем.',
+    settLearning:'Настройки обучения', settNewPerDay:'Новых слов в день', settNewPerDayDesc:'Сколько новых карточек добавлять',
+    settStudyLang:'Перевод на карточке', settStudyLangDesc:'На каком языке учить перевод слова',
+    settInterfaceLang:'Язык интерфейса',
+    settData:'Данные и офлайн', exportBtn:'Сохранить копию (экспорт) ↓', importBtn:'Загрузить копию (импорт) ↑',
+    resetBtn:'Сбросить весь прогресс ⟲', resetConfirm:'Весь прогресс изучения будет удалён. Продолжить?',
+    exportedToast:'Экспортировано', importedToast:'Импортировано', importErrToast:'Ошибка файла импорта', resetToast:'Прогресс сброшен',
+    footer:'TM Easy Dutch — офлайн-словарь с интервальным повторением и созвучиями. 208 слов уровня A2-B1-B2 уже загружены со всеми историями — ничего скачивать не нужно.',
+    storageWarn:'Не удалось сохранить прогресс в этом браузере.',
+    offlineNote:'Все 208 слов и истории уже встроены в файл — приложение работает полностью офлайн. Прогресс сохраняется прямо в этом браузере (localStorage). Если открываете файл внутри чата Claude, для надёжного сохранения и офлайн-доступа скачайте файл и откройте его напрямую в браузере телефона (Safari/Chrome) — можно даже добавить на домашний экран как приложение.',
+    localStorageFailWarn:'Хранилище браузера недоступно (например, приватный режим) — прогресс не будет сохранён после закрытия.'
+  },
+  en: {
+    subtitle: 'Nederlands · A2-B1-B2 · offline',
+    statRep: 'due', statNew: 'new', statLearned: 'learned',
+    tabStudy: 'Study', tabWords: 'Words', tabAdd: 'Add', tabAnchor: 'Test', tabDehet: 'de·het', tabSettings: 'More',
+    cardOf: (i,n)=>`Card ${i} of ${n}`, statusNew:'new', statusRep:'review',
+    tapHint: 'tap the card to reveal the translation',
+    quickKnow: '✓ I know it — next',
+    gAgain:'Forgot', gAgainSub:'again', gGood:'Almost', gGoodSub:'almost', gEasy:'Know', gEasySub:'know it',
+    mnemoLabel:'Sound-alike', storyLabel:'Mini-story',
+    anchorTestQuestion:'Which story matches this word?',
+    anchorCorrect:'Correct!', anchorWrong:'Not quite. The right one is',
+    anchorDone:'Test round finished', anchorEmpty:'No studied words yet for the test. Study a few cards in "Study" first.',
+    masteredToast:"🏆 Word mastered — it will now show up much less often",
+    batchAvailable:(n)=>`New batch available: +${n} words`, loadBatchBtn:'⬇️ Load next batch',
+    batchLoadedToast:(n)=>`${n} new words added!`, noMoreBatches:'All available batches are already loaded. Ask for a new batch in chat!',
+    allDone:'All done for today!', allDoneDesc:'New cards will appear tomorrow, or head to the Words tab to add more.',
+    replayBtn:"🔁 Replay today's words", replayHint:'words done today',
+    searchPh:'Search word or translation...', chipAll:'All', chipNew:'New', chipLearning:'Learning', chipReview:'Review',
+    notFound:'Nothing found',
+    back:'← Back', delete:'🗑', translRu:'Translation (Russian)', mnemoField:'Sound-alike', storyField:'Mini-story', exampleField:'Example sentence',
+    regen:'🔄 Generate with AI (needs internet)', save:'Save', savedToast:'Saved', regenToast:'Generating with AI…', regenOfflineToast:'No connection — fill it in manually', deletedToast:'Deleted', deleteConfirm:'Delete this word?',
+    addTitle:'Add a word', fieldNl:'Dutch word', fieldArticle:'Article', fieldRuTr:'Translation (Russian)',
+    fieldEnTr:'Translation (English, optional)', fieldPos:'Part of speech', posNoun:'noun', posVerb:'verb',
+    posAdj:'adjective', posAdv:'adverb', posConj:'conjunction / linker', posOther:'other',
+    fieldMnemo:'Sound-alike (optional)', fieldStory:'Mini-story (optional)', fieldExample:'Example sentence (optional)',
+    addBtn:'Add word', aiAssistBtn:'✨ Fill in with AI (needs internet)', enterWordToast:'Enter the Dutch word', addedToast:'Word added',
+    dehetTitle:'Guess the article', dehetDone:'Round finished', dehetRight:'Correct', dehetWrong:'Wrong', dehetRestart:'Start again', dehetEmpty:'No words with a known article yet.',
+    settLearning:'Study settings', settNewPerDay:'New words per day', settNewPerDayDesc:'How many new cards to introduce',
+    settStudyLang:'Card translation', settStudyLangDesc:'Which language to study the translation in',
+    settInterfaceLang:'Interface language',
+    settData:'Data & offline', exportBtn:'Save a backup (export) ↓', importBtn:'Load a backup (import) ↑',
+    resetBtn:'Reset all progress ⟲', resetConfirm:'All learning progress will be deleted. Continue?',
+    exportedToast:'Exported', importedToast:'Imported', importErrToast:'Import file error', resetToast:'Progress reset',
+    footer:'TM Easy Dutch — an offline dictionary with spaced repetition and sound-alike mnemonics. 208 A2-B1-B2 words are already loaded with full stories — nothing to download.',
+    storageWarn:'Could not save progress in this browser.',
+    offlineNote:"All 208 words and stories are built into this file — the app works fully offline. Progress is saved right in this browser (localStorage). If you're viewing this inside the Claude chat, for reliable saving and true offline access, download the file and open it directly in your phone's browser (Safari/Chrome) — you can even add it to your home screen as an app.",
+    localStorageFailWarn:"This browser's storage is unavailable (e.g. private mode) — progress won't be saved after closing."
+  }
+};
+function t(key, ...args){
+  const dict = STRINGS[STATE.settings.lang] || STRINGS.ru;
+  const v = dict[key];
+  if(typeof v === 'function') return v(...args);
+  return v !== undefined ? v : (STRINGS.ru[key] || key);
+}
+
+/* ================= STORAGE (localStorage, fully offline) ================= */
+const LS_PREFIX = 'tm_easy_dutch_';
+let localStorageOk = true;
+try{
+  localStorage.setItem(LS_PREFIX+'_probe','1');
+  localStorage.removeItem(LS_PREFIX+'_probe');
+}catch(e){ localStorageOk = false; }
+
+const memoryFallback = {};
+function lsGet(key){
+  if(!localStorageOk) return memoryFallback[key] || null;
+  try{ return localStorage.getItem(LS_PREFIX+key); }catch(e){ return memoryFallback[key] || null; }
+}
+function lsSet(key, val){
+  if(!localStorageOk){ memoryFallback[key] = val; return false; }
+  try{ localStorage.setItem(LS_PREFIX+key, val); return true; }catch(e){ memoryFallback[key] = val; return false; }
+}
+
+function saveCore(){
+  const ok = lsSet('core', JSON.stringify({
+    settings: STATE.settings, progress: STATE.progress, manual: STATE.manual,
+    overrides: STATE.overrides, daily: STATE.daily
+  }));
+  if(!ok) toast(t('storageWarn'));
+}
+function loadCore(){
+  const raw = lsGet('core');
+  if(!raw) return null;
+  try{ return JSON.parse(raw); }catch(e){ return null; }
+}
+
+let STATE = {
+  settings: { newPerDay: 10, lang: 'ru', studyLang: 'ru', unlockedBatches: [1] },
+  progress: {},     // id -> {status,interval,ease,due,reps,lapses,knowStreak}
+  manual: [],       // user-added words, full records
+  overrides: {},    // id -> partial edits for built-in words
+  daily: { date: '', count: 0, reviewedIds: [] }
+};
+
+let WORDS = []; // unified: {id, nl, en, source}
+
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function buildWordList(){
+  const unlocked = new Set(STATE.settings.unlockedBatches || [1]);
+  WORDS = DUTCH_WORDS.filter(w=>unlocked.has(w.batch||1)).map(w=>({id:w.id, nl:w.nl, en:w.en, source:'builtin'}));
+  STATE.manual.forEach(w=>{ WORDS.push({id:w.id, nl:w.nl, en:w.en||'', source:'manual'}); });
+}
+
+function unlockNextBatch(){
+  const current = STATE.settings.unlockedBatches || [1];
+  const nextBatch = Math.max(...current) + 1;
+  if(nextBatch > MAX_BATCH) return false;
+  STATE.settings.unlockedBatches = current.concat([nextBatch]);
+  saveCore();
+  buildWordList();
+  refreshStats();
+  return true;
+}
+
+function nextBatchWordCount(){
+  const current = STATE.settings.unlockedBatches || [1];
+  const nextBatch = Math.max(...current) + 1;
+  if(nextBatch > MAX_BATCH) return 0;
+  return DUTCH_WORDS.filter(w=>w.batch===nextBatch).length;
+}
+
+function getWordData(id){
+  if(BUILTIN_BY_ID[id]){
+    const base = BUILTIN_BY_ID[id];
+    const ov = STATE.overrides[id];
+    return ov ? Object.assign({}, base, ov) : base;
+  }
+  return STATE.manual.find(w=>w.id===id) || {};
+}
+
+function getCard(id){
+  return STATE.progress[id] || {status:'new', interval:0, ease:2.5, due:0, reps:0, lapses:0, knowStreak:0};
+}
+
+/* ================= INIT ================= */
+function init(){
+  const core = loadCore();
+  if(core){
+    STATE.settings = Object.assign(STATE.settings, core.settings || {});
+    STATE.progress = core.progress || {};
+    STATE.manual = core.manual || [];
+    STATE.overrides = core.overrides || {};
+    STATE.daily = core.daily || {date:'', count:0, reviewedIds:[]};
+  }
+  if(!STATE.daily.reviewedIds) STATE.daily.reviewedIds = [];
+  if(STATE.daily.date !== todayStr()){
+    STATE.daily = {date: todayStr(), count:0, reviewedIds:[]};
+    saveCore();
+  }
+  if(!localStorageOk) toast(t('localStorageFailWarn'));
+  buildWordList();
+  applyLangToStaticUI();
+  refreshStats();
+  renderTab('study');
+}
+
+function applyLangToStaticUI(){
+  document.getElementById('subtitleEl').textContent = t('subtitle');
+  document.getElementById('statRepLbl').textContent = t('statRep');
+  document.getElementById('statNewLbl').textContent = t('statNew');
+  document.getElementById('statLearnedLbl').textContent = t('statLearned');
+  const tabs = document.querySelectorAll('.tabbar button');
+  const keys = ['tabStudy','tabWords','tabAdd','tabAnchor','tabDehet','tabSettings'];
+  tabs.forEach((btn,i)=>{ const lbl = btn.querySelector('.lbl'); if(lbl) lbl.textContent = t(keys[i]); });
+}
+
+function refreshStats(){
+  let rep=0, nw=0, learned=0;
+  const now = Date.now();
+  WORDS.forEach(w=>{
+    const c = getCard(w.id);
+    if(c.status==='new') nw++;
+    else if(c.status!=='new' && c.due<=now) rep++;
+    if(c.reps>=1 && c.interval>=21) learned++;
+  });
+  document.getElementById('statRep').textContent = rep;
+  document.getElementById('statNew').textContent = Math.min(nw, Math.max(0, STATE.settings.newPerDay - STATE.daily.count));
+  document.getElementById('statLearned').textContent = learned;
+}
+
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>el.classList.remove('show'), 2400);
+}
+
+/* ================= TAB ROUTING ================= */
+document.querySelectorAll('.tabbar button').forEach((btn)=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTab(btn.dataset.tab);
+  });
+});
+
+function renderTab(name){
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  applyLangToStaticUI();
+  if(name==='study') renderStudy(main);
+  else if(name==='words') renderWords(main);
+  else if(name==='add') renderAdd(main);
+  else if(name==='anchor') renderAnchorTest(main);
+  else if(name==='dehet') renderDehet(main);
+  else if(name==='settings') renderSettings(main);
+}
+
+/* ================= STUDY ================= */
+let studyQueue = [];
+let studyIndex = 0;
+let currentRevealed = false;
+let replayMode = false;
+
+function buildQueue(){
+  const now = Date.now();
+  const due = [];
+  const fresh = [];
+  WORDS.forEach(w=>{
+    const c = getCard(w.id);
+    if(c.status==='new') fresh.push(w);
+    else if(c.due<=now) due.push(w);
+  });
+  const remaining = Math.max(0, STATE.settings.newPerDay - STATE.daily.count);
+  const freshCapped = fresh.slice(0, remaining);
+  studyQueue = due.concat(freshCapped);
+  studyIndex = 0;
+  replayMode = false;
+}
+
+function renderStudy(main){
+  buildQueue();
+  main.innerHTML = `<div class="deck-wrap" id="deckWrap"></div>`;
+  renderCurrentCard();
+}
+
+function tileCornerSvg(){
+  return `<svg class="tile-corner" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="1.4"><path d="M2 22 C2 10 10 2 22 2" stroke-dasharray="2 3"/><circle cx="4" cy="20" r="1.4" fill="#1B3A6B" stroke="none"/></svg>`;
+}
+
+function primaryTranslation(w, m){
+  if(STATE.settings.studyLang === 'en') return w.en || m.ru || '';
+  return m.ru || w.en || '';
+}
+function secondaryTranslation(w, m){
+  if(STATE.settings.studyLang === 'en') return m.ru || '';
+  return w.en || '';
+}
+
+function renderCurrentCard(){
+  const wrap = document.getElementById('deckWrap');
+  if(!wrap) return;
+  if(studyIndex >= studyQueue.length){
+    const reviewedCount = STATE.daily.reviewedIds.length;
+    wrap.innerHTML = `<div class="empty-state"><div class="big">🌷</div>
+      <div style="font-family:var(--font-display);font-size:19px;color:var(--delft-deep);margin-bottom:6px;">${t('allDone')}</div>
+      <div class="muted">${t('allDoneDesc')}</div>
+      ${reviewedCount>0 ? `<div style="margin-top:18px;">
+        <button class="btn btn-outline" id="replayBtn">${t('replayBtn')}</button>
+        <div class="muted" style="margin-top:8px;">${reviewedCount} ${t('replayHint')}</div>
+      </div>` : ''}
+      </div>`;
+    const rb = document.getElementById('replayBtn');
+    if(rb) rb.addEventListener('click', startReplay);
+    refreshStats();
+    return;
+  }
+  const w = studyQueue[studyIndex];
+  const m = getWordData(w.id);
+  const card = getCard(w.id);
+  const total = studyQueue.length;
+  currentRevealed = false;
+
+  wrap.innerHTML = `
+    <div class="progress-line"><span>${t('cardOf', studyIndex+1, total)}${replayMode?' · 🔁':''}</span><span>${card.status==='new' && !replayMode ? t('statusNew') : t('statusRep')}</span></div>
+    <div class="tile-card" id="tileCard">
+      ${tileCornerSvg()}
+      <div class="card-body" id="cardBody">
+        <div class="nl-word">${escapeHtml(w.nl)}</div>
+        ${m.example_nl ? `<div class="example-box">${escapeHtml(m.example_nl)}</div>` : ''}
+        <div class="reveal-hint">${t('tapHint')}</div>
+        <button class="btn btn-outline" id="quickKnowBtn" style="margin-top:16px;">${t('quickKnow')}</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('tileCard').addEventListener('click', onCardTap);
+  document.getElementById('quickKnowBtn').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    currentRevealed = true;
+    grade(studyQueue[studyIndex], 'good');
+  });
+}
+
+function onCardTap(){
+  if(currentRevealed) return;
+  currentRevealed = true;
+  const w = studyQueue[studyIndex];
+  const m = getWordData(w.id);
+  showBack(w, m);
+}
+
+function showBack(w, m){
+  const body = document.getElementById('cardBody');
+  const article = m.article ? `<div class="article-badge ${m.article}">${escapeHtml(m.article)}</div>` : '';
+  const primary = primaryTranslation(w, m);
+  const secondary = secondaryTranslation(w, m);
+  const exampleTr = STATE.settings.studyLang === 'en' ? m.example_en : m.example_ru;
+  body.innerHTML = `
+    ${article}
+    <div class="nl-word" style="font-size:26px;margin-bottom:10px;">${escapeHtml(w.nl)}</div>
+    <div class="back-block">
+      <div class="tr-ru">${escapeHtml(primary || '—')}</div>
+      ${secondary ? `<div class="tr-en">${escapeHtml(secondary)}</div>` : ''}
+      ${m.mnemonic ? `<div class="mnemo-box">
+        <div class="mnemo-label">${t('mnemoLabel')}</div>
+        <div class="mnemo-text">${escapeHtml(m.mnemonic)}</div>
+      </div>` : ''}
+      ${m.story ? `<div class="story-box">
+        <div class="story-label">${t('storyLabel')}</div>
+        <div class="story-text">${escapeHtml(m.story)}</div>
+      </div>` : ''}
+      ${m.example_nl ? `<div class="example-box">
+        <div>${escapeHtml(m.example_nl)}</div>
+        ${exampleTr ? `<div style="margin-top:3px;opacity:0.8;">${escapeHtml(exampleTr)}</div>` : ''}
+      </div>` : ''}
+    </div>
+    <div class="grade-row">
+      <button class="grade-btn g-again" data-g="again">${t('gAgain')}<small>${t('gAgainSub')}</small></button>
+      <button class="grade-btn g-good" data-g="good">${t('gGood')}<small>${t('gGoodSub')}</small></button>
+      <button class="grade-btn g-easy" data-g="easy">${t('gEasy')}<small>${t('gEasySub')}</small></button>
+    </div>
+  `;
+  document.querySelectorAll('.grade-btn').forEach(b=>{
+    b.addEventListener('click', (e)=>{ e.stopPropagation(); grade(w, b.dataset.g); });
+  });
+}
+
+function grade(w, g){
+  if(!STATE.daily.reviewedIds.includes(w.id)) STATE.daily.reviewedIds.push(w.id);
+
+  if(!replayMode){
+    const c = getCard(w.id);
+    const wasNew = c.status === 'new';
+    let {interval, ease, reps, lapses, knowStreak} = c;
+    ease = ease || 2.5;
+    interval = interval || 0;
+    knowStreak = knowStreak || 0;
+    let justMastered = false;
+
+    if(g==='again'){
+      ease = Math.max(1.3, ease - 0.2);
+      interval = 0;
+      lapses = (lapses||0) + (c.status==='review' ? 1 : 0);
+      c.status = 'learning';
+      knowStreak = 0;
+    } else if(g==='good'){
+      interval = (c.status==='new' || c.status==='learning') ? 1 : Math.max(1, Math.round(interval * ease));
+      c.status = 'review';
+      reps = (reps||0) + 1;
+      knowStreak = 0;
+    } else if(g==='easy'){
+      ease = Math.min(3.0, ease + 0.15);
+      knowStreak += 1;
+      if(knowStreak >= 5){
+        // Mastered: push far out so it stops competing with less-known words.
+        interval = Math.max(interval * 3, 60);
+        justMastered = true;
+      } else {
+        interval = (c.status==='new' || c.status==='learning') ? 4 : Math.max(1, Math.round(interval * ease * 1.3));
+      }
+      c.status = 'review';
+      reps = (reps||0) + 1;
+    }
+
+    const dueMs = g==='again' ? Date.now() + 5*60*1000 : Date.now() + interval*24*60*60*1000;
+    STATE.progress[w.id] = {status:c.status, interval, ease, due:dueMs, reps, lapses, knowStreak};
+
+    if(wasNew && g!=='again') STATE.daily.count += 1;
+    if(g==='again') studyQueue.push(w);
+    if(justMastered) toast(t('masteredToast'));
+  }
+
+  saveCore();
+  studyIndex++;
+  renderCurrentCard();
+  refreshStats();
+}
+
+function startReplay(){
+  const ids = STATE.daily.reviewedIds;
+  studyQueue = ids.map(id=>WORDS.find(w=>w.id===id)).filter(Boolean);
+  studyIndex = 0;
+  replayMode = true;
+  renderCurrentCard();
+}
+
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ================= OPTIONAL ONLINE AI-ASSIST (used only when explicitly requested) ================= */
+async function generateMnemonic(nl, en){
+  const studyLangNote = STATE.settings.studyLang === 'en'
+    ? 'Пользователь ориентируется на английский перевод, но созвучие подбирай по звучанию — можно на русском или английском, смотря что звучит точнее.'
+    : 'Пользователь ориентируется на русский перевод, но созвучие подбирай по звучанию — можно на русском или английском, смотря что звучит точнее.';
+  const sys = `Ты помогаешь пользователю запоминать голландские слова (уровень A2-B2) методом фонетических ассоциаций (созвучий). Для голландского слова дай: 1) точный перевод на русский (1-4 слова), 2) созвучие — русское или английское слово/фраза, звучащая похоже на голландское слово, 3) короткую яркую мини-историю ВСЕГДА НА РУССКОМ (1-2 предложения), которая связывает созвучие со значением слова, 4) если слово существительное — артикль (de или het), иначе null, 5) короткий естественный пример предложения на голландском уровня A2-B2 с этим словом, 6) перевод примера на русский, 7) перевод примера на английский. ${studyLangNote} Отвечай СТРОГО в формате JSON без markdown и пояснений: {"ru":"...","mnemonic":"...","story":"...","article":"de"|"het"|null,"example_nl":"...","example_ru":"...","example_en":"..."}`;
+  const userMsg = `Голландское слово: "${nl}"${en ? ' (примерный смысл по-английски: '+en+')' : ''}`;
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1000, system: sys, messages: [{role:"user", content: userMsg}] })
+  });
+  const data = await response.json();
+  const text = (data.content||[]).map(b=>b.text||'').join('').trim();
+  const clean = text.replace(/```json|```/g,'').trim();
+  const parsed = JSON.parse(clean);
+  return {
+    ru: parsed.ru || '', mnemonic: parsed.mnemonic || '', story: parsed.story || '', article: parsed.article || null,
+    example_nl: parsed.example_nl || '', example_ru: parsed.example_ru || '', example_en: parsed.example_en || ''
+  };
+}
+
+/* ================= WORDS LIST ================= */
+let wordsFilter = '';
+let wordsStatusFilter = 'all';
+
+function renderWords(main){
+  main.innerHTML = `
+    <div class="search-bar">
+      <span class="search-ic">🔍</span>
+      <input type="text" id="wsearch" placeholder="${t('searchPh')}">
+    </div>
+    <div class="chip-row">
+      <div class="chip ${wordsStatusFilter==='all'?'sel':''}" data-f="all">${t('chipAll')}</div>
+      <div class="chip ${wordsStatusFilter==='new'?'sel':''}" data-f="new">${t('chipNew')}</div>
+      <div class="chip ${wordsStatusFilter==='learning'?'sel':''}" data-f="learning">${t('chipLearning')}</div>
+      <div class="chip ${wordsStatusFilter==='review'?'sel':''}" data-f="review">${t('chipReview')}</div>
+    </div>
+    <div class="card" id="wlistCard" style="max-height:none;"></div>
+  `;
+  document.getElementById('wsearch').value = wordsFilter;
+  document.getElementById('wsearch').addEventListener('input', e=>{ wordsFilter = e.target.value.toLowerCase(); renderWordsList(); });
+  document.querySelectorAll('.chip').forEach(ch=>{
+    ch.addEventListener('click', ()=>{ wordsStatusFilter = ch.dataset.f; renderWords(main); });
+  });
+  renderWordsList();
+}
+
+function renderWordsList(){
+  const listEl = document.getElementById('wlistCard');
+  if(!listEl) return;
+  let list = WORDS.filter(w=>{
+    const c = getCard(w.id);
+    if(wordsStatusFilter!=='all' && c.status!==wordsStatusFilter) return false;
+    if(wordsFilter && !(w.nl.toLowerCase().includes(wordsFilter) || (w.en||'').toLowerCase().includes(wordsFilter))) return false;
+    return true;
+  });
+  if(list.length===0){
+    listEl.innerHTML = `<div class="empty-state" style="padding:24px 10px;"><div class="muted">${t('notFound')}</div></div>`;
+    return;
+  }
+  listEl.innerHTML = list.map(w=>{
+    const c = getCard(w.id);
+    const m = getWordData(w.id);
+    const sub = STATE.settings.studyLang==='en' ? (w.en||'') : (m.ru || w.en || '');
+    return `<div class="word-row" data-id="${w.id}">
+      <div class="wr-left">
+        <div class="wr-nl">${escapeHtml(w.nl)}</div>
+        <div class="wr-ru">${escapeHtml(sub)}</div>
+      </div>
+      <div class="badge ${c.status}">${(c.knowStreak||0)>=5 ? '🏆' : c.status==='new'?t('statusNew'):c.status==='learning'?t('chipLearning'):t('statusRep')}</div>
+    </div>`;
+  }).join('');
+  listEl.querySelectorAll('.word-row').forEach(row=>{
+    row.addEventListener('click', ()=>openWordDetail(row.dataset.id));
+  });
+}
+
+function openWordDetail(id){
+  const w = WORDS.find(x=>x.id===id);
+  if(!w) return;
+  const m = getWordData(id);
+  const main = document.getElementById('main');
+  const isManual = !BUILTIN_BY_ID[id];
+  main.innerHTML = `
+    <div class="top-actions">
+      <button class="icon-btn" id="backBtn">${t('back')}</button>
+      ${isManual ? `<button class="icon-btn" id="delBtn">${t('delete')}</button>` : ''}
+    </div>
+    <div class="card">
+      ${m.article ? `<div class="article-badge ${m.article}">${escapeHtml(m.article)}</div>` : ''}
+      <div class="nl-word" style="font-size:28px;">${escapeHtml(w.nl)}</div>
+      <div class="tr-en" style="text-align:left;margin:6px 0 14px;">${escapeHtml(w.en||'')}</div>
+      <label class="field-label">${t('translRu')}</label>
+      <input type="text" id="editRu" value="${escapeHtml(m.ru||'')}">
+      <label class="field-label">${t('mnemoField')}</label>
+      <input type="text" id="editMnemo" value="${escapeHtml(m.mnemonic||'')}">
+      <label class="field-label">${t('storyField')}</label>
+      <textarea id="editStory">${escapeHtml(m.story||'')}</textarea>
+      <label class="field-label">${t('exampleField')}</label>
+      <textarea id="editExampleNl" placeholder="Ik ga morgen naar de markt.">${escapeHtml(m.example_nl||'')}</textarea>
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn btn-outline" id="regenBtn">${t('regen')}</button>
+        <button class="btn btn-primary" id="saveBtn">${t('save')}</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('backBtn').addEventListener('click', ()=>renderTab('words'));
+  document.getElementById('saveBtn').addEventListener('click', ()=>{
+    const edited = {
+      ru: document.getElementById('editRu').value,
+      mnemonic: document.getElementById('editMnemo').value,
+      story: document.getElementById('editStory').value,
+      article: m.article,
+      example_nl: document.getElementById('editExampleNl').value,
+      example_ru: m.example_ru || '',
+      example_en: m.example_en || ''
+    };
+    if(isManual){
+      const idx = STATE.manual.findIndex(x=>x.id===id);
+      if(idx>=0) STATE.manual[idx] = Object.assign({}, STATE.manual[idx], edited);
+    } else {
+      STATE.overrides[id] = edited;
+    }
+    saveCore();
+    toast(t('savedToast'));
+    renderTab('words');
+  });
+  document.getElementById('regenBtn').addEventListener('click', async ()=>{
+    toast(t('regenToast'));
+    try{
+      const nm = await generateMnemonic(w.nl, w.en);
+      if(isManual){
+        const idx = STATE.manual.findIndex(x=>x.id===id);
+        if(idx>=0) STATE.manual[idx] = Object.assign({}, STATE.manual[idx], nm);
+      } else {
+        STATE.overrides[id] = nm;
+      }
+      saveCore();
+      openWordDetail(id);
+    }catch(e){
+      toast(t('regenOfflineToast'));
+    }
+  });
+  const delBtn = document.getElementById('delBtn');
+  if(delBtn){
+    delBtn.addEventListener('click', ()=>{
+      if(!confirm(t('deleteConfirm'))) return;
+      STATE.manual = STATE.manual.filter(x=>x.id!==id);
+      delete STATE.progress[id];
+      saveCore();
+      buildWordList();
+      toast(t('deletedToast'));
+      renderTab('words');
+    });
+  }
+}
+
+/* ================= ADD WORD ================= */
+let addArticle = null;
+
+function renderAdd(main){
+  addArticle = null;
+  main.innerHTML = `
+    <div class="card">
+      <div class="section-title">${t('addTitle')}</div>
+      <label class="field-label">${t('fieldNl')}</label>
+      <input type="text" id="fNl" placeholder="verjaardag">
+      <label class="field-label">${t('fieldArticle')}</label>
+      <div class="seg">
+        <button data-a="de" id="artDe">de</button>
+        <button data-a="het" id="artHet">het</button>
+        <button data-a="" id="artNone">—</button>
+      </div>
+      <label class="field-label">${t('fieldRuTr')}</label>
+      <input type="text" id="fRu" placeholder="день рождения">
+      <label class="field-label">${t('fieldEnTr')}</label>
+      <input type="text" id="fEn" placeholder="birthday">
+      <label class="field-label">${t('fieldPos')}</label>
+      <select id="fPos">
+        <option value="noun">${t('posNoun')}</option>
+        <option value="verb">${t('posVerb')}</option>
+        <option value="adj">${t('posAdj')}</option>
+        <option value="adv">${t('posAdv')}</option>
+        <option value="conj">${t('posConj')}</option>
+        <option value="other">${t('posOther')}</option>
+      </select>
+      <label class="field-label">${t('fieldMnemo')}</label>
+      <input type="text" id="fMnemo" placeholder="созвучие">
+      <label class="field-label">${t('fieldStory')}</label>
+      <textarea id="fStory" placeholder="мини-история"></textarea>
+      <label class="field-label">${t('fieldExample')}</label>
+      <textarea id="fExample" placeholder="Gefeliciteerd met je verjaardag!"></textarea>
+      <div class="btn-row" style="margin-top:16px;">
+        <button class="btn btn-outline" id="aiAssistBtn">${t('aiAssistBtn')}</button>
+      </div>
+      <div style="margin-top:10px;">
+        <button class="btn btn-primary" id="saveWordBtn">${t('addBtn')}</button>
+      </div>
+    </div>
+  `;
+  document.querySelectorAll('.seg button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('.seg button').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');
+      addArticle = b.dataset.a || null;
+    });
+  });
+  document.getElementById('artNone').classList.add('sel');
+  document.getElementById('saveWordBtn').addEventListener('click', saveManualWord);
+  document.getElementById('aiAssistBtn').addEventListener('click', async ()=>{
+    const nl = document.getElementById('fNl').value.trim();
+    if(!nl){ toast(t('enterWordToast')); return; }
+    toast(t('regenToast'));
+    try{
+      const en = document.getElementById('fEn').value.trim();
+      const nm = await generateMnemonic(nl, en);
+      document.getElementById('fRu').value = nm.ru || document.getElementById('fRu').value;
+      document.getElementById('fMnemo').value = nm.mnemonic || '';
+      document.getElementById('fStory').value = nm.story || '';
+      document.getElementById('fExample').value = nm.example_nl || '';
+      if(nm.article==='de') document.getElementById('artDe').click();
+      if(nm.article==='het') document.getElementById('artHet').click();
+      toast(t('savedToast'));
+    }catch(e){
+      toast(t('regenOfflineToast'));
+    }
+  });
+}
+
+function saveManualWord(){
+  const nl = document.getElementById('fNl').value.trim();
+  const ru = document.getElementById('fRu').value.trim();
+  const en = document.getElementById('fEn').value.trim();
+  const mnemonic = document.getElementById('fMnemo').value.trim();
+  const story = document.getElementById('fStory').value.trim();
+  const example_nl = document.getElementById('fExample').value.trim();
+  if(!nl){ toast(t('enterWordToast')); return; }
+  const id = 'm' + Date.now();
+  STATE.manual.push({id, nl, article: addArticle, ru, en, mnemonic, story, example_nl, example_ru:'', example_en:''});
+  saveCore();
+  buildWordList();
+  toast(t('addedToast'));
+  renderTab('add');
+  refreshStats();
+}
+
+/* ================= ANCHOR TEST (standalone activity) ================= */
+let anchorPool = [];
+let anchorIdx = 0;
+let anchorScore = {right:0, wrong:0};
+
+function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function stripWord(text, word){
+  if(!text || !word) return text;
+  const re = new RegExp('\\b' + escapeRegExp(word) + '\\b', 'gi');
+  return text.replace(re, '…');
+}
+
+function stripGiveaways(text, nl, en){
+  let out = stripWord(text, nl);
+  if(en){
+    out = stripWord(out, en);
+    const enNoTo = en.replace(/^to\s+/i, '');
+    if(enNoTo !== en) out = stripWord(out, enNoTo);
+  }
+  return out.replace(/\s{2,}/g, ' ').trim();
+}
+
+function buildAnchorPool(){
+  // Only quiz on words the learner has actually started studying (not brand-new/unseen).
+  const studied = WORDS.filter(w=>getCard(w.id).status !== 'new');
+  const allWithStory = WORDS.map(w=>({w, m:getWordData(w.id)})).filter(x=>x.m.story);
+  const studiedWithStory = studied.map(w=>({w, m:getWordData(w.id)})).filter(x=>x.m.story);
+
+  anchorPool = studiedWithStory.map(({w,m})=>{
+    let decoy;
+    do { decoy = allWithStory[Math.floor(Math.random()*allWithStory.length)]; } while(decoy.w.id===w.id && allWithStory.length>1);
+    const correctIsA = Math.random() < 0.5;
+    const ownStripped = stripGiveaways(m.story, w.nl, w.en);
+    const decoyStripped = stripGiveaways(decoy.m.story, decoy.w.nl, decoy.w.en);
+    return {
+      nl: w.nl,
+      optionA: correctIsA ? ownStripped : decoyStripped,
+      optionB: correctIsA ? decoyStripped : ownStripped,
+      correct: correctIsA ? 'A' : 'B'
+    };
+  });
+  for(let i=anchorPool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [anchorPool[i],anchorPool[j]]=[anchorPool[j],anchorPool[i]]; }
+  anchorIdx = 0;
+  anchorScore = {right:0, wrong:0};
+}
+
+function renderAnchorTest(main){
+  buildAnchorPool();
+  main.innerHTML = `<div class="deck-wrap" id="anchorWrap"></div>`;
+  renderAnchorCard();
+}
+
+function renderAnchorCard(){
+  const wrap = document.getElementById('anchorWrap');
+  if(!wrap) return;
+  if(anchorPool.length===0){
+    wrap.innerHTML = `<div class="empty-state"><div class="big">🧩</div><div class="muted">${t('anchorEmpty')}</div></div>`;
+    return;
+  }
+  if(anchorIdx >= anchorPool.length){
+    wrap.innerHTML = `<div class="empty-state"><div class="big">🧩</div>
+      <div style="font-family:var(--font-display);font-size:19px;color:var(--delft-deep);margin-bottom:6px;">${t('anchorDone')}</div>
+      <div class="muted">${t('dehetRight')}: ${anchorScore.right} · ${t('dehetWrong')}: ${anchorScore.wrong}</div>
+      <div style="margin-top:16px;"><button class="btn btn-primary" id="restartAnchor">${t('dehetRestart')}</button></div>
+    </div>`;
+    document.getElementById('restartAnchor').addEventListener('click', ()=>{ buildAnchorPool(); renderAnchorCard(); });
+    return;
+  }
+  const item = anchorPool[anchorIdx];
+  wrap.innerHTML = `
+    <div class="progress-line"><span>${anchorIdx+1} / ${anchorPool.length}</span><span>✓ ${anchorScore.right} · ✗ ${anchorScore.wrong}</span></div>
+    <div class="tile-card">
+      ${tileCornerSvg()}
+      <div class="card-body" style="align-items:stretch;">
+        <div class="pos-tag" style="text-align:center;">${t('anchorTestQuestion')}</div>
+        <div class="nl-word" style="text-align:center;margin-bottom:14px;">${escapeHtml(item.nl)}</div>
+        <button class="btn btn-ghost" style="text-align:left;white-space:normal;height:auto;padding:11px 13px;margin-bottom:8px;" id="optA">А) ${escapeHtml(item.optionA)}</button>
+        <button class="btn btn-ghost" style="text-align:left;white-space:normal;height:auto;padding:11px 13px;" id="optB">Б) ${escapeHtml(item.optionB)}</button>
+        <div id="anchorFeedback" style="margin-top:12px;font-weight:700;text-align:center;"></div>
+      </div>
+    </div>
+  `;
+  const check = (pick)=>{
+    const fb = document.getElementById('anchorFeedback');
+    const correct = pick === item.correct;
+    if(correct){ anchorScore.right++; fb.style.color='var(--good)'; fb.textContent = t('anchorCorrect'); }
+    else { anchorScore.wrong++; fb.style.color='var(--bad)'; fb.textContent = t('anchorWrong') + ' ' + (item.correct==='A'?'А':'Б'); }
+    document.getElementById('optA').disabled = true;
+    document.getElementById('optB').disabled = true;
+    setTimeout(()=>{ anchorIdx++; renderAnchorCard(); }, 1400);
+  };
+  document.getElementById('optA').addEventListener('click', ()=>check('A'));
+  document.getElementById('optB').addEventListener('click', ()=>check('B'));
+}
+
+/* ================= DE / HET TRAINER ================= */
+let dehetPool = [];
+let dehetIdx = 0;
+let dehetScore = {right:0, wrong:0};
+
+function buildDehetPool(){
+  const pool = [];
+  WORDS.forEach(w=>{
+    const m = getWordData(w.id);
+    if(m.article==='de' || m.article==='het') pool.push({nl:w.nl, article:m.article});
+  });
+  dehetPool = pool;
+  for(let i=dehetPool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [dehetPool[i],dehetPool[j]]=[dehetPool[j],dehetPool[i]]; }
+  dehetIdx = 0;
+  dehetScore = {right:0, wrong:0};
+}
+
+function renderDehet(main){
+  buildDehetPool();
+  main.innerHTML = `<div class="deck-wrap" id="dehetWrap"></div>`;
+  renderDehetCard();
+}
+
+function renderDehetCard(){
+  const wrap = document.getElementById('dehetWrap');
+  if(!wrap) return;
+  if(dehetPool.length===0){
+    wrap.innerHTML = `<div class="empty-state"><div class="big">🎯</div><div class="muted">${t('dehetEmpty')}</div></div>`;
+    return;
+  }
+  if(dehetIdx >= dehetPool.length){
+    wrap.innerHTML = `<div class="empty-state"><div class="big">🎯</div>
+      <div style="font-family:var(--font-display);font-size:19px;color:var(--delft-deep);margin-bottom:6px;">${t('dehetDone')}</div>
+      <div class="muted">${t('dehetRight')}: ${dehetScore.right} · ${t('dehetWrong')}: ${dehetScore.wrong}</div>
+      <div style="margin-top:16px;"><button class="btn btn-primary" id="restartDehet">${t('dehetRestart')}</button></div>
+    </div>`;
+    document.getElementById('restartDehet').addEventListener('click', ()=>{ buildDehetPool(); renderDehetCard(); });
+    return;
+  }
+  const item = dehetPool[dehetIdx];
+  wrap.innerHTML = `
+    <div class="progress-line"><span>${dehetIdx+1} / ${dehetPool.length}</span><span>✓ ${dehetScore.right} · ✗ ${dehetScore.wrong}</span></div>
+    <div class="tile-card">
+      ${tileCornerSvg()}
+      <div class="card-body">
+        <div class="pos-tag">${t('dehetTitle')}</div>
+        <div class="nl-word">${escapeHtml(item.nl)}</div>
+        <div class="grade-row" style="margin-top:26px;">
+          <button class="grade-btn g-good" id="pickDe" style="background:var(--delft-mid)">de</button>
+          <button class="grade-btn g-easy" id="pickHet" style="background:var(--ochre)">het</button>
+        </div>
+        <div id="dehetFeedback" style="margin-top:14px; font-weight:700;"></div>
+      </div>
+    </div>
+  `;
+  document.getElementById('pickDe').addEventListener('click', ()=>answerDehet('de', item));
+  document.getElementById('pickHet').addEventListener('click', ()=>answerDehet('het', item));
+}
+
+function answerDehet(pick, item){
+  const fb = document.getElementById('dehetFeedback');
+  const correct = pick === item.article;
+  if(correct){ dehetScore.right++; fb.style.color='var(--good)'; fb.textContent=(STATE.settings.lang==='en'?'Correct! ':'Верно! ')+item.article+' '+item.nl; }
+  else { dehetScore.wrong++; fb.style.color='var(--bad)'; fb.textContent=(STATE.settings.lang==='en'?'Correct answer: ':'Правильно: ')+item.article+' '+item.nl; }
+  document.getElementById('pickDe').disabled = true;
+  document.getElementById('pickHet').disabled = true;
+  setTimeout(()=>{ dehetIdx++; renderDehetCard(); }, 900);
+}
+
+/* ================= SETTINGS ================= */
+function renderSettings(main){
+  main.innerHTML = `
+    <div class="offline-banner">${t('offlineNote')}</div>
+    <div class="card">
+      <div class="section-title">${t('settLearning')}</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">${t('settNewPerDay')}</div>
+          <div class="setting-desc">${t('settNewPerDayDesc')}</div>
+        </div>
+        <div class="number-stepper">
+          <button id="npdMinus">–</button>
+          <b id="npdVal">${STATE.settings.newPerDay}</b>
+          <button id="npdPlus">+</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">${t('settStudyLang')}</div><div class="setting-desc">${t('settStudyLangDesc')}</div></div>
+        <div class="seg" style="width:120px;">
+          <button data-sl="ru" id="slRu">RU</button>
+          <button data-sl="en" id="slEn">EN</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">${t('settInterfaceLang')}</div></div>
+        <div class="seg" style="width:120px;">
+          <button data-il="ru" id="ilRu">RU</button>
+          <button data-il="en" id="ilEn">EN</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">📦 ${STATE.settings.lang==='en'?'Word batches':'Порции слов'}</div>
+      <div class="muted" style="margin-bottom:10px;">${WORDS.length} ${STATE.settings.lang==='en'?'words loaded so far.':'слов уже загружено.'}</div>
+      <div id="batchArea"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">${t('settData')}</div>
+      <div class="btn-row" style="margin-bottom:10px;">
+        <button class="btn btn-outline" id="exportBtn">${t('exportBtn')}</button>
+      </div>
+      <div class="btn-row" style="margin-bottom:10px;">
+        <button class="btn btn-outline" id="importBtn">${t('importBtn')}</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none;">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" id="resetBtn">${t('resetBtn')}</button>
+      </div>
+    </div>
+
+    <footer class="appfoot">${t('footer')}</footer>
+  `;
+  const batchArea = document.getElementById('batchArea');
+  const nextCount = nextBatchWordCount();
+  if(nextCount > 0){
+    batchArea.innerHTML = `
+      <div class="muted" style="margin-bottom:10px;">${t('batchAvailable', nextCount)}</div>
+      <button class="btn btn-primary" id="loadBatchBtn">${t('loadBatchBtn')}</button>
+    `;
+    document.getElementById('loadBatchBtn').addEventListener('click', ()=>{
+      const before = WORDS.length;
+      unlockNextBatch();
+      const added = WORDS.length - before;
+      toast(t('batchLoadedToast', added));
+      renderTab('settings');
+    });
+  } else {
+    batchArea.innerHTML = `<div class="muted">${t('noMoreBatches')}</div>`;
+  }
+  document.getElementById('slRu').classList.toggle('sel', STATE.settings.studyLang==='ru');
+  document.getElementById('slEn').classList.toggle('sel', STATE.settings.studyLang==='en');
+  document.getElementById('ilRu').classList.toggle('sel', STATE.settings.lang==='ru');
+  document.getElementById('ilEn').classList.toggle('sel', STATE.settings.lang==='en');
+
+  document.getElementById('npdMinus').addEventListener('click', ()=>{
+    STATE.settings.newPerDay = Math.max(1, STATE.settings.newPerDay - 5);
+    document.getElementById('npdVal').textContent = STATE.settings.newPerDay;
+    saveCore(); refreshStats();
+  });
+  document.getElementById('npdPlus').addEventListener('click', ()=>{
+    STATE.settings.newPerDay = Math.min(100, STATE.settings.newPerDay + 5);
+    document.getElementById('npdVal').textContent = STATE.settings.newPerDay;
+    saveCore(); refreshStats();
+  });
+  document.getElementById('slRu').addEventListener('click', ()=>{ STATE.settings.studyLang='ru'; saveCore(); renderSettings(main); });
+  document.getElementById('slEn').addEventListener('click', ()=>{ STATE.settings.studyLang='en'; saveCore(); renderSettings(main); });
+  document.getElementById('ilRu').addEventListener('click', ()=>{ STATE.settings.lang='ru'; saveCore(); renderTab('settings'); });
+  document.getElementById('ilEn').addEventListener('click', ()=>{ STATE.settings.lang='en'; saveCore(); renderTab('settings'); });
+
+  document.getElementById('exportBtn').addEventListener('click', doExport);
+  document.getElementById('importBtn').addEventListener('click', ()=>document.getElementById('importFile').click());
+  document.getElementById('importFile').addEventListener('change', doImport);
+  document.getElementById('resetBtn').addEventListener('click', doReset);
+}
+
+function doExport(){
+  const payload = {
+    settings: STATE.settings, progress: STATE.progress, manual: STATE.manual,
+    overrides: STATE.overrides, daily: STATE.daily, exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'tm-easy-dutch-backup-'+todayStr()+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(t('exportedToast'));
+}
+
+function doImport(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const payload = JSON.parse(ev.target.result);
+      if(payload.settings) STATE.settings = Object.assign(STATE.settings, payload.settings);
+      if(payload.progress) STATE.progress = Object.assign(STATE.progress, payload.progress);
+      if(payload.overrides) STATE.overrides = Object.assign(STATE.overrides, payload.overrides);
+      if(payload.manual){
+        const existingIds = new Set(STATE.manual.map(x=>x.id));
+        payload.manual.forEach(w=>{ if(!existingIds.has(w.id)) STATE.manual.push(w); });
+      }
+      saveCore();
+      buildWordList();
+      refreshStats();
+      toast(t('importedToast'));
+    }catch(err){ toast(t('importErrToast')); }
+  };
+  reader.readAsText(file);
+}
+
+function doReset(){
+  if(!confirm(t('resetConfirm'))) return;
+  STATE.progress = {};
+  STATE.daily = {date: todayStr(), count:0, reviewedIds:[]};
+  saveCore();
+  refreshStats();
+  toast(t('resetToast'));
+  renderTab('study');
+}
+
+/* ================= START ================= */
+init();
+
+</script>
+</body>
+</html>
